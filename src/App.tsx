@@ -1,13 +1,19 @@
-import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { routeTree } from "./routeTree.gen";
+import { RouterProvider } from "@tanstack/react-router";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PocketProvider } from "./context/AuthContext";
-const router = createRouter({ routeTree });
+import { usePocket } from "./hooks/useAuth";
+import { router } from "./router";
 
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
+}
+
+function InnerApp() {
+  const { user } = usePocket();
+  return <RouterProvider router={router} context={{ user }} />;
 }
 
 function App() {
@@ -16,7 +22,7 @@ function App() {
   return (
     <PocketProvider>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <InnerApp />
       </QueryClientProvider>
     </PocketProvider>
   );

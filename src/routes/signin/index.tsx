@@ -1,13 +1,21 @@
-import { createLazyFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
-import { usePocket } from "../../context/AuthContext";
+import { usePocket } from "../../hooks/useAuth";
+import { useEffect } from "react";
 
-export const Route = createLazyFileRoute("/signin/")({
+export const Route = createFileRoute("/signin/")({
+  beforeLoad: ({ context }) => {
+    if (context.user) {
+      throw redirect({ to: "/" });
+    }
+  },
+
   component: SignIn,
 });
 
 function SignIn() {
-  const { login } = usePocket();
+  const navigate = useNavigate();
+  const { login, user } = usePocket();
   const form = useForm({
     defaultValues: {
       username: "",
@@ -20,16 +28,25 @@ function SignIn() {
           values.value.password
         );
         console.log(authData);
-        if (authData) {
-          redirect({
-            to: "/",
-          });
-        }
+
+        // if (authData.token && user) {
+        //   console.log("passing in function");
+        //   navigate({ to: "/" });
+        // }
+
+        console.log("passing here!");
       } catch (error) {
         console.error(error);
       }
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      console.log("passing in useeffect");
+      navigate({ to: "/" });
+    }
+  }, [user, navigate]);
 
   return (
     <div>
@@ -37,7 +54,7 @@ function SignIn() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          e.stopPropagation();
+          //   e.stopPropagation();
           form.handleSubmit();
         }}
       >

@@ -1,4 +1,4 @@
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext, TAuthContext } from "../context/AuthContext";
 
-export const usePocket = () => useContext(AuthContext);
+export const usePocket = () => useContext(AuthContext) as TAuthContext;

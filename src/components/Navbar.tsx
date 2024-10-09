@@ -1,20 +1,31 @@
 import { Link } from "@tanstack/react-router";
-import { pb } from "../lib/pocketbase";
-import { useState } from "react";
 import { usePocket } from "../hooks/useAuth";
+import { useNavigate } from "@tanstack/react-router";
 
 const Navbar = () => {
   const { user, logout } = usePocket();
-
+  const navigate = useNavigate();
   return (
     <nav className="flex justify-between">
-      <Link to="/" className="[&.active]:font-bold">
-        Home
-      </Link>{" "}
+      <ul>
+        <li>
+          <Link to="/" className="[&.active]:font-bold">
+            Home
+          </Link>{" "}
+        </li>
+      </ul>
+
       {user ? (
         <>
-          <div>{user?.username}</div>
-          <button onClick={logout}>Sign Out</button>
+          <li>{user?.username}</li>
+          <li
+            onClick={() => {
+              logout();
+              navigate({ to: "/signin" });
+            }}
+          >
+            Sign Out
+          </li>
         </>
       ) : (
         <Link to="/signin">Login</Link>

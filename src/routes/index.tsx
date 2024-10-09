@@ -1,6 +1,14 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import useGetTodos from "../query/useGetTodos";
-export const Route = createLazyFileRoute("/")({
+export const Route = createFileRoute("/")({
+  beforeLoad: ({ context }) => {
+    if (!context.user) {
+      throw redirect({
+        to: "/signin",
+        // search
+      });
+    }
+  },
   component: HomePage,
 });
 
