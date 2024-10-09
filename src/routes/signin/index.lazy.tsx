@@ -1,18 +1,33 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, redirect } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
+import { usePocket } from "../../context/AuthContext";
 
 export const Route = createLazyFileRoute("/signin/")({
   component: SignIn,
 });
 
 function SignIn() {
+  const { login } = usePocket();
   const form = useForm({
     defaultValues: {
       username: "",
       password: "",
     },
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      try {
+        const authData = await login(
+          values.value.username,
+          values.value.password
+        );
+        console.log(authData);
+        if (authData) {
+          redirect({
+            to: "/",
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
   });
 
