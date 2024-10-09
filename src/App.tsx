@@ -1,9 +1,8 @@
 import { RouterProvider } from "@tanstack/react-router";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { PocketProvider } from "./context/AuthContext";
-import { usePocket } from "./hooks/useAuth";
-import { router } from "./router";
+import { PocketProvider } from "@/context/AuthContext";
+import { usePocket } from "@/hooks/useAuth";
+import { router } from "@/router";
 
 declare module "@tanstack/react-router" {
   interface Register {

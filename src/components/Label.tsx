@@ -9,7 +9,7 @@ const Label = ({ children, className }: PropTypes) => {
     <label
       className={clsx(
         className,
-        "flex w-full gap-x-1 align-middle select-none leading-4 text-gray-500 tracking-tight pt-3 pb-1 px-3"
+        "flex w-full gap-x-1 align-middle select-none leading-4 text-secondary tracking-tight pt-3 pb-1 px-3"
       )}
     >
       {children}

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { usePocket } from "../hooks/useAuth";
+import { usePocket } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
 
 const Navbar = () => {

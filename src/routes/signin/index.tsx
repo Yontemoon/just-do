@@ -43,13 +43,15 @@ function SignIn() {
 
   return (
     <div className="w-96 m-0 mx-auto max-w-full">
-      <h2>Sign in form</h2>
+      <h2 className="text-center mb-5">Sign In</h2>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
         }}
+        className="grid gap-3"
       >
         <form.Field
           name="username"
@@ -62,20 +64,22 @@ function SignIn() {
             },
           }}
           children={(field) => (
-            <FormField>
-              <Label>Username</Label>
-              <Input
-                id="username"
-                type="text"
-                value={field.state.value}
-                onChange={(e: { target: { value: Updater<string> } }) =>
-                  field.handleChange(e.target.value)
-                }
-              />
+            <>
+              <FormField>
+                <Label>Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e: { target: { value: Updater<string> } }) =>
+                    field.handleChange(e.target.value)
+                  }
+                />
+              </FormField>
               {field.state.meta.errors && (
                 <div className="text-red-500">{field.state.meta.errors}</div>
               )}
-            </FormField>
+            </>
           )}
         />
         <form.Field
