@@ -1,7 +1,11 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useForm } from "@tanstack/react-form";
+import { Updater, useForm } from "@tanstack/react-form";
 import { usePocket } from "../../hooks/useAuth";
 import { useEffect } from "react";
+import Input from "../../components/Input";
+import FormField from "../../components/FormField";
+import Label from "../../components/Label";
+import Button from "../../components/Button";
 
 export const Route = createFileRoute("/signin/")({
   beforeLoad: ({ context }) => {
@@ -23,18 +27,7 @@ function SignIn() {
     },
     onSubmit: async (values) => {
       try {
-        const authData = await login(
-          values.value.username,
-          values.value.password
-        );
-        console.log(authData);
-
-        // if (authData.token && user) {
-        //   console.log("passing in function");
-        //   navigate({ to: "/" });
-        // }
-
-        console.log("passing here!");
+        await login(values.value.username, values.value.password);
       } catch (error) {
         console.error(error);
       }
@@ -49,12 +42,12 @@ function SignIn() {
   }, [user, navigate]);
 
   return (
-    <div>
+    <div className="w-96 m-0 mx-auto max-w-full">
       <h2>Sign in form</h2>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          //   e.stopPropagation();
+          e.stopPropagation();
           form.handleSubmit();
         }}
       >
@@ -69,37 +62,39 @@ function SignIn() {
             },
           }}
           children={(field) => (
-            <div>
-              <label>Username</label>
-              <input
+            <FormField>
+              <Label>Username</Label>
+              <Input
                 id="username"
                 type="text"
                 value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                className="border border-black"
+                onChange={(e: { target: { value: Updater<string> } }) =>
+                  field.handleChange(e.target.value)
+                }
               />
               {field.state.meta.errors && (
                 <div className="text-red-500">{field.state.meta.errors}</div>
               )}
-            </div>
+            </FormField>
           )}
         />
         <form.Field
           name="password"
           children={(field) => (
-            <div>
-              <label>Password</label>
-              <input
+            <FormField>
+              <Label>Password</Label>
+              <Input
                 id="password"
                 type="password"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
-                className="border border-black"
               />
-            </div>
+            </FormField>
           )}
         />
-        <button type="submit">Login</button>
+        <Button type="submit" className="w-full">
+          Login
+        </Button>
       </form>
     </div>
   );

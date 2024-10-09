@@ -31,7 +31,6 @@ const fiveMinutesInMs = ms("5 minutes");
 const twoMinutesInMs = ms("2 minutes");
 
 export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
-  // const navigate = useNavigate({ from: "/" });
   const pb = useMemo(
     () => new PocketBase(import.meta.env.VITE_PB_BASE_URL),
     []
