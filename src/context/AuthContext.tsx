@@ -19,7 +19,7 @@ export type TAuthContext = {
   login: (
     email: string,
     password: string
-  ) => Promise<RecordAuthResponse<RecordModel>>;
+  ) => Promise<RecordAuthResponse<RecordModel> | undefined>;
   logout: () => void;
   user: AuthModel;
   token: string | null;
@@ -41,6 +41,7 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     return pb.authStore.onChange((token, model) => {
+      console.log(token, model);
       setToken(token);
       setUser(model);
     });
@@ -53,18 +54,25 @@ export const PocketProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    const authData = await pb
-      .collection("users")
-      .authWithPassword(email, password);
-    if (authData) {
-      setUser(authData);
-      setToken(authData.token);
+    try {
+      const authData = await pb
+        .collection("users")
+        .authWithPassword(email, password);
+      if (authData) {
+        setUser(authData.record);
+        setToken(authData.token);
+      }
+      return authData;
+    } catch (error) {
+      console.error(error);
+      return;
     }
-    return authData;
   };
 
   const logout = () => {
     pb.authStore.clear();
+    setToken(null);
+    setUser(null);
   };
 
   const refreshSession = useCallback(async () => {

@@ -1,4 +1,10 @@
 import { useContext } from "react";
-import { AuthContext, TAuthContext } from "@/context/AuthContext";
+import { AuthContext } from "@/context/AuthContext";
 
-export const usePocket = () => useContext(AuthContext) as TAuthContext;
+export const usePocket = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("usePocket must be inside the AuthProvider");
+  }
+  return context;
+};

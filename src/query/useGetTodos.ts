@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getTodos } from "../lib/pocketbase";
-import { usePocket } from "../hooks/useAuth";
+import { getTodos } from "@/lib/pocketbase";
+import { usePocket } from "@/hooks/useAuth";
 
 function useGetTodos() {
   const { user } = usePocket();

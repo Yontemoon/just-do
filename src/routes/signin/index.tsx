@@ -27,19 +27,27 @@ function SignIn() {
     },
     onSubmit: async (values) => {
       try {
-        await login(values.value.username, values.value.password);
+        const response = await login(
+          values.value.username,
+          values.value.password
+        );
+        console.log(response);
+        if (response) {
+          navigate({ to: "/" });
+        }
+        navigate({ to: "/" });
       } catch (error) {
         console.error(error);
       }
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      console.log("passing in useeffect");
-      navigate({ to: "/" });
-    }
-  }, [user, navigate]);
+  // useEffect(() => {
+  //   if (user) {
+  //     console.log("passing in useeffect");
+  //     navigate({ to: "/" });
+  //   }
+  // }, [user, navigate]);
 
   return (
     <div className="w-96 m-0 mx-auto max-w-full">
@@ -48,7 +56,7 @@ function SignIn() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          e.stopPropagation();
+          // e.stopPropagation();
           form.handleSubmit();
         }}
         className="grid gap-3"
