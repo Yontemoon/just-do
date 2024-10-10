@@ -3,21 +3,21 @@ import { useOnClickOutside } from "usehooks-ts";
 import { useDialogStore } from "@/store/useDialogStore";
 
 type PropTypes = DialogHTMLAttributes<HTMLDialogElement> & {
-  openModal: boolean;
-  closeModal: () => void;
   children: React.ReactNode;
 };
-const Dialog = ({ openModal, children }: PropTypes) => {
+const Dialog = ({ children }: PropTypes) => {
   const ref = useRef<HTMLDialogElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const { closeDialog } = useDialogStore();
+  const { closeDialog, isDialogOpen } = useDialogStore();
+  const isOpen = isDialogOpen();
+
   useEffect(() => {
-    if (openModal) {
+    if (isOpen) {
       ref?.current?.showModal();
     } else {
       ref?.current?.close();
     }
-  }, [openModal]);
+  }, [isOpen]);
 
   useOnClickOutside(wrapperRef, closeDialog);
 

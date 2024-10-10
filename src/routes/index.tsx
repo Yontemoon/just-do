@@ -2,7 +2,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import useGetTodos from "@/query/useGetTodos";
 import { useForm } from "@tanstack/react-form";
 import { pb } from "@/lib/pocketbase";
-import { usePocket } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
@@ -10,6 +9,7 @@ import Label from "@/components/Label";
 import DialogEditTodo from "@/components/dialogs/DialogEditTodo";
 import { useDialogStore } from "@/store/useDialogStore";
 import { RecordModel } from "pocketbase";
+import DialogConfirmDeleteTodo from "@/components/dialogs/DialogConfirmDeleteTodo";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
@@ -25,27 +25,21 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { data: todos, isLoading, error } = useGetTodos();
-  // const [openDialog, setOpenDialog] = useState(false);
-  // const [openDialogId, setOpenDialogId] = useState<string | null>(null);
+
   const {
     dialogComponent: DialogComponent,
     dialogProps,
     openDialog,
-    // closeDialog,
   } = useDialogStore();
 
   const queryClient = useQueryClient();
-
-  const { user } = usePocket();
 
   function handleOpenDialog(todo: RecordModel) {
     openDialog(DialogEditTodo, { todo });
   }
 
-  async function handleDeleteTodo(todoId: string) {
-    await pb.collection("todos").delete(todoId);
-    const currentUser = pb?.authStore?.model?.id;
-    queryClient.invalidateQueries({ queryKey: ["todos", currentUser] });
+  function handleDeleteTodo(todoId: string) {
+    openDialog(DialogConfirmDeleteTodo, { todoId });
   }
 
   const form = useForm({
@@ -57,8 +51,6 @@ function HomePage() {
         const currentUser = pb?.authStore?.model?.id;
         console.log(currentUser);
         if (currentUser) {
-          console.log("user is loggged", user);
-
           const response = await pb.collection("todos").create({
             todo: value.todo,
             user: currentUser,
@@ -132,7 +124,7 @@ function HomePage() {
         {todos?.map((todo) => (
           <li
             key={todo.id}
-            className="hover:cursor-pointer hover:text-secondary flex mb-2"
+            className="hover:cursor-pointer hover:text-secondary flex mb-2 justify-between"
           >
             <p onClick={() => handleOpenDialog(todo)} id="modal-trigger">
               {todo.todo} -- {todo.created}{" "}

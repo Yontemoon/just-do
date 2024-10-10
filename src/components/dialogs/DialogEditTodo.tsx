@@ -19,17 +19,14 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
       todo: todo.todo,
     },
     onSubmit: async ({ value: updatedTodo }) => {
-      const updateTodo = await pb
-        .collection("todos")
-        .update(todo.id, { todo: updatedTodo.todo });
-      console.log(updateTodo);
+      await pb.collection("todos").update(todo.id, { todo: updatedTodo.todo });
       queryClient.invalidateQueries({ queryKey: ["todos", todo.user] });
       closeDialog();
     },
   });
 
   return (
-    <Dialog closeModal={closeDialog} openModal={true}>
+    <Dialog>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
