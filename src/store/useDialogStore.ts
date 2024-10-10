@@ -1,25 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
+import { ComponentType } from "react";
 
-// Define the type for our dialog components
-type DialogComponent = React.ComponentType<any>;
-
-// Define the store state
-interface DialogState {
-  isOpen: boolean;
-  component: DialogComponent | null;
-  props: Record<string, any>;
-  openDialog: (component: DialogComponent, props?: Record<string, any>) => void;
+type DialogState = {
+  dialogComponent: ComponentType<any> | null;
+  dialogProps?: { [key: string]: unknown };
+  openDialog: (
+    Component: ComponentType<any>,
+    props: { [key: string]: unknown }
+  ) => void;
   closeDialog: () => void;
-}
+};
 
-// Create the store
-const useDialogStore = create<DialogState>((set) => ({
-  isOpen: false,
-  component: null,
-  props: {},
-  openDialog: (component, props = {}) =>
-    set({ isOpen: true, component, props }),
-  closeDialog: () => set({ isOpen: false, component: null, props: {} }),
+export const useDialogStore = create<DialogState>((set) => ({
+  dialogComponent: null,
+  dialogProps: {},
+  openDialog: (Component, props) =>
+    set({ dialogComponent: Component, dialogProps: props }),
+  closeDialog: () => set({ dialogComponent: null, dialogProps: {} }),
 }));
-
-export default useDialogStore;
