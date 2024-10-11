@@ -1,15 +1,14 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { Updater, useForm } from "@tanstack/react-form";
-import { usePocket } from "../../hooks/useAuth";
-import { useEffect } from "react";
-import Input from "../../components/Input";
-import FormField from "../../components/FormField";
-import Label from "../../components/Label";
-import Button from "../../components/Button";
+import Input from "@/components/Input";
+import FormField from "@/components/FormField";
+import Label from "@/components/Label";
+import Button from "@/components/Button";
+import { authAction, auth } from "@/helper/auth";
 
 export const Route = createFileRoute("/signin/")({
-  beforeLoad: ({ context }) => {
-    if (context.user) {
+  beforeLoad: () => {
+    if (auth.getUserId()) {
       throw redirect({ to: "/" });
     }
   },
@@ -19,7 +18,6 @@ export const Route = createFileRoute("/signin/")({
 
 function SignIn() {
   const navigate = useNavigate();
-  const { login, user } = usePocket();
   const form = useForm({
     defaultValues: {
       username: "",
@@ -27,7 +25,7 @@ function SignIn() {
     },
     onSubmit: async (values) => {
       try {
-        const response = await login(
+        const response = await authAction.login(
           values.value.username,
           values.value.password
         );
@@ -41,13 +39,6 @@ function SignIn() {
       }
     },
   });
-
-  // useEffect(() => {
-  //   if (user) {
-  //     console.log("passing in useeffect");
-  //     navigate({ to: "/" });
-  //   }
-  // }, [user, navigate]);
 
   return (
     <div className="w-96 m-0 mx-auto max-w-full">

@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { usePocket } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
+import { auth, authAction } from "@/helper/auth";
 
 const Navbar = () => {
-  const { user, logout } = usePocket();
   const navigate = useNavigate();
+  const userInfo = auth.getUserInfo();
   return (
     <nav className="flex justify-between">
       <ul>
@@ -15,12 +15,12 @@ const Navbar = () => {
         </li>
       </ul>
 
-      {user ? (
+      {userInfo ? (
         <>
-          <li>{user?.username}</li>
+          <li>{userInfo.user}</li>
           <li
             onClick={() => {
-              logout();
+              authAction.logout();
               navigate({ to: "/signin" });
             }}
           >

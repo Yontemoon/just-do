@@ -3,7 +3,7 @@ import Dialog from "../Dialog";
 import Button from "../Button";
 import { pb } from "@/lib/pocketbase";
 import { useQueryClient } from "@tanstack/react-query";
-import { getUserId } from "@/helper/auth";
+import { auth } from "@/helper/auth";
 
 type PropTypes = {
   todoId: string;
@@ -16,17 +16,19 @@ const DialogConfirmDeleteTodo = ({ todoId }: PropTypes) => {
   return (
     <Dialog>
       <h2>Are you sure??</h2>
-      <Button
-        onClick={async () => {
-          const userId = getUserId();
-          await pb.collection("todos").delete(todoId);
-          queryClient.invalidateQueries({ queryKey: ["todos", userId] });
-          closeDialog();
-        }}
-      >
-        Confirm
-      </Button>
-      <Button onClick={closeDialog}>Close</Button>
+      <div className="flex justify-between">
+        <Button
+          onClick={async () => {
+            const userId = auth.getUserId();
+            await pb.collection("todos").delete(todoId);
+            queryClient.invalidateQueries({ queryKey: ["todos", userId] });
+            closeDialog();
+          }}
+        >
+          Confirm
+        </Button>
+        <Button onClick={closeDialog}>Close</Button>
+      </div>
     </Dialog>
   );
 };

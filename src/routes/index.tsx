@@ -1,7 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import useGetTodos from "@/query/useGetTodos";
 import { useForm } from "@tanstack/react-form";
-import { pb } from "@/lib/pocketbase";
 import { useQueryClient } from "@tanstack/react-query";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
@@ -10,10 +9,12 @@ import DialogEditTodo from "@/components/dialogs/DialogEditTodo";
 import { useDialogStore } from "@/store/useDialogStore";
 import { RecordModel } from "pocketbase";
 import DialogConfirmDeleteTodo from "@/components/dialogs/DialogConfirmDeleteTodo";
+import { auth } from "@/helper/auth";
+import todos from "@/helper/todos";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
-    const user = pb.authStore.model?.id;
+    const user = auth.getUserId;
     if (!user) {
       throw redirect({
         to: "/signin",
@@ -24,7 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { data: todos, isLoading, error } = useGetTodos();
+  const { data: todosList, isLoading, error } = useGetTodos();
 
   const {
     dialogComponent: DialogComponent,
@@ -48,13 +49,10 @@ function HomePage() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const currentUser = pb?.authStore?.model?.id;
+        const currentUser = auth.getUserId();
         console.log(currentUser);
         if (currentUser) {
-          const response = await pb.collection("todos").create({
-            todo: value.todo,
-            user: currentUser,
-          });
+          const response = await todos.create(value.todo, currentUser);
           if (response) {
             queryClient.invalidateQueries({ queryKey: ["todos", currentUser] });
           }
@@ -121,7 +119,7 @@ function HomePage() {
       {DialogComponent && <DialogComponent {...dialogProps} />}
 
       <ul className="underline">
-        {todos?.map((todo) => (
+        {todosList?.map((todo) => (
           <li
             key={todo.id}
             className="hover:cursor-pointer hover:text-secondary flex mb-2 justify-between"
