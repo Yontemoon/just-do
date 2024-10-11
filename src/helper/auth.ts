@@ -35,6 +35,9 @@ const authAction = {
       .collection("users")
       .create({ email, password, passwordConfirm });
   },
+  change: async function (callback: () => void, fireImmediately?: boolean) {
+    pb.authStore.onChange(callback, fireImmediately);
+  },
 };
 
 export { auth, authAction };

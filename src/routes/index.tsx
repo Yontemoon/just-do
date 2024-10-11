@@ -1,7 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import useGetTodos from "@/query/useGetTodos";
+import useGetTodos from "@/hooks/query/useGetTodos";
 import { useForm } from "@tanstack/react-form";
-import { useQueryClient } from "@tanstack/react-query";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Label from "@/components/Label";
@@ -11,10 +10,11 @@ import { RecordModel } from "pocketbase";
 import DialogConfirmDeleteTodo from "@/components/dialogs/DialogConfirmDeleteTodo";
 import { auth } from "@/helper/auth";
 import todos from "@/helper/todos";
+import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
-    const user = auth.getUserId;
+    const user = auth.getUserId();
     if (!user) {
       throw redirect({
         to: "/signin",
@@ -32,8 +32,7 @@ function HomePage() {
     dialogProps,
     openDialog,
   } = useDialogStore();
-
-  const queryClient = useQueryClient();
+  const invalidateQueries = useInvalidateQueries();
 
   function handleOpenDialog(todo: RecordModel) {
     openDialog(DialogEditTodo, { todo });
@@ -54,7 +53,7 @@ function HomePage() {
         if (currentUser) {
           const response = await todos.create(value.todo, currentUser);
           if (response) {
-            queryClient.invalidateQueries({ queryKey: ["todos", currentUser] });
+            invalidateQueries("todos", currentUser);
           }
           return response;
         } else {

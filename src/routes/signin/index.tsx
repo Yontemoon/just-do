@@ -1,10 +1,19 @@
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { Updater, useForm } from "@tanstack/react-form";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
+import { useForm } from "@tanstack/react-form";
 import Input from "@/components/Input";
 import FormField from "@/components/FormField";
 import Label from "@/components/Label";
 import Button from "@/components/Button";
 import { authAction, auth } from "@/helper/auth";
+import { useState } from "react";
+import { SignInSchema } from "@/types/z.types";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import FieldInfo from "@/components/FieldInfo";
 
 export const Route = createFileRoute("/signin/")({
   beforeLoad: () => {
@@ -17,26 +26,28 @@ export const Route = createFileRoute("/signin/")({
 });
 
 function SignIn() {
+  const [serverValidation, setServerValidation] = useState("");
   const navigate = useNavigate();
+
   const form = useForm({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
     onSubmit: async (values) => {
       try {
-        const response = await authAction.login(
-          values.value.username,
-          values.value.password
-        );
-        console.log(response);
-        if (response) {
-          navigate({ to: "/" });
-        }
+        await authAction.login(values.value.email, values.value.password);
+
         navigate({ to: "/" });
       } catch (error) {
+        setServerValidation("Email or password is invalid.");
         console.error(error);
       }
+    },
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChangeAsyncDebounceMs: 500,
+      onChangeAsync: SignInSchema,
     },
   });
 
@@ -47,57 +58,57 @@ function SignIn() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          // e.stopPropagation();
+          e.stopPropagation();
           form.handleSubmit();
         }}
         className="grid gap-3"
       >
         <form.Field
-          name="username"
-          validators={{
-            onChangeAsyncDebounceMs: 500,
-            onChangeAsync: ({ value }) => {
-              if (value.length < 3) {
-                return "Username must be at least 3 characters long.";
-              }
-            },
-          }}
+          name="email"
           children={(field) => (
             <>
               <FormField>
-                <Label>Username</Label>
+                <Label>Email</Label>
                 <Input
-                  id="username"
                   type="text"
                   value={field.state.value}
-                  onChange={(e: { target: { value: Updater<string> } }) =>
-                    field.handleChange(e.target.value)
-                  }
+                  onChange={(e) => field.handleChange(e.target.value)}
                 />
               </FormField>
-              {field.state.meta.errors && (
-                <div className="text-red-500">{field.state.meta.errors}</div>
-              )}
+              <FieldInfo fieldMeta={field.state.meta} />
             </>
           )}
         />
         <form.Field
           name="password"
           children={(field) => (
-            <FormField>
-              <Label>Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </FormField>
+            <>
+              <FormField>
+                <Label>Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </FormField>
+              <FieldInfo fieldMeta={field.state.meta} />
+            </>
           )}
         />
-        <Button type="submit" className="w-full">
-          Login
-        </Button>
+        <Link to="/signup">Don't have an account?</Link>
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button type="submit" className="w-full" disabled={!canSubmit}>
+              {isSubmitting ? "Loading..." : "Login"}
+            </Button>
+          )}
+        />
+
+        <div className="text-center text-red-500 text-lg">
+          <span>{serverValidation}</span>
+        </div>
       </form>
     </div>
   );
