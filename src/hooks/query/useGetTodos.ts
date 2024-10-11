@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { usePocket } from "@/hooks/useAuth";
 import todos from "@/helper/todos";
+import { auth } from "@/helper/auth";
 
 function useGetTodos() {
-  const { user } = usePocket();
+  const userId = auth.getUserId();
   const { data, isLoading, error } = useQuery({
-    queryKey: ["todos", user?.id],
+    queryKey: ["todos", userId],
     queryFn: async () => {
       const response = await todos.list();
       return response;
