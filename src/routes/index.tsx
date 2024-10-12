@@ -16,9 +16,14 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import FieldInfo from "@/components/FieldInfo";
 import clsx from "clsx";
 import { z } from "zod";
+import { date } from "@/helper/utils";
 
 const searchParamsSchema = z.object({
   display: z.enum(["all", "complete", "incomplete"]).catch("all"),
+  date: z.string().catch(() => {
+    const today = date.getToday();
+    return today;
+  }),
 });
 
 // type searchParams = z.infer<typeof searchParamsSchema>;
@@ -37,7 +42,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { display } = Route.useSearch();
+  const { display, date } = Route.useSearch();
 
   const { data: todosList, isLoading, error } = useGetTodos(display);
   const {
@@ -61,6 +66,18 @@ function HomePage() {
       await todos.update.completion(todo.id, isComplete);
       invalidateQueries("todos", userId);
     }
+  }
+
+  function handleYesterday() {
+    navigate({
+      search: (prev) => ({ ...prev, date: date.getYesterday(prev.date) }),
+    });
+  }
+
+  function handleTomorrow() {
+    navigate({
+      search: (prev) => ({ ...prev, date: date.getTomorrow(prev.date) }),
+    });
   }
   const navigate = useNavigate({ from: Route.fullPath });
   const form = useForm({
@@ -116,6 +133,8 @@ function HomePage() {
         <option value="incomplete">Incomplete</option>
         <option value="complete">Complete</option>
       </select>
+      <Button onClick={handleYesterday}>Yesterday</Button>
+      <Button onClick={handleTomorrow}>Tomorrow</Button>
       <form
         className="mb-5"
         onSubmit={async (e) => {
@@ -158,24 +177,26 @@ function HomePage() {
 
       <ul className="">
         {todosList?.map((todo) => (
-          <li
-            key={todo.id}
-            className="hover:cursor-pointer hover:text-secondary flex mb-2 justify-between z-0 hover:bg-gray-200"
-            onClick={() => handleOpenDialog(todo)}
-          >
-            <p
-              className={clsx(todo.is_complete && "line-through", "z-10")}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleTodoComplete(todo, !todo.is_complete);
-              }}
+          <div className="flex justify-between mb-2 ">
+            <li
+              key={todo.id}
+              className="hover:cursor-pointer hover:text-secondary z-0 hover:bg-gray-200 w-full"
+              onClick={() => handleOpenDialog(todo)}
             >
-              {todo.todo} -- {todo.created}{" "}
-            </p>
+              <span
+                className={clsx(todo.is_complete && "line-through", "z-10")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleTodoComplete(todo, !todo.is_complete);
+                }}
+              >
+                {todo.todo} -- {todo.created}{" "}
+              </span>
+            </li>
             <Button onClick={() => handleDeleteTodo(todo.id)} className="z-50">
               Delete
             </Button>
-          </li>
+          </div>
         ))}
       </ul>
     </main>
