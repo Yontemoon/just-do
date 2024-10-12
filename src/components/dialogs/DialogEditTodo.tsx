@@ -1,27 +1,30 @@
 import { useForm } from "@tanstack/react-form";
 import Input from "../Input";
 import Button from "../Button";
-import { pb } from "@/lib/pocketbase";
 import { RecordModel } from "pocketbase";
-import { useQueryClient } from "@tanstack/react-query";
 import { useDialogStore } from "@/store/useDialogStore";
 import Dialog from "../Dialog";
-
+import useInvalidateQueries from "@/hooks/useInvalidateQueries";
+import { auth } from "@/helper/auth";
+import todos from "@/helper/todos";
 type PropTypes = {
   todo: RecordModel;
 };
 
 const DialogEditTodo = ({ todo }: PropTypes) => {
-  const queryClient = useQueryClient();
+  const invalidateQuery = useInvalidateQueries();
   const { closeDialog } = useDialogStore();
   const form = useForm({
     defaultValues: {
       todo: todo.todo,
     },
     onSubmit: async ({ value: updatedTodo }) => {
-      await pb.collection("todos").update(todo.id, { todo: updatedTodo.todo });
-      queryClient.invalidateQueries({ queryKey: ["todos", todo.user] });
-      closeDialog();
+      const userId = auth.getUserId();
+      if (userId) {
+        await todos.update.todo(todo.id, updatedTodo.todo);
+        invalidateQuery("todos", userId);
+        closeDialog();
+      }
     },
   });
 

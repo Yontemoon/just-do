@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import useGetTodos from "@/hooks/query/useGetTodos";
 import { useForm } from "@tanstack/react-form";
 import Button from "@/components/Button";
@@ -11,8 +11,20 @@ import DialogConfirmDeleteTodo from "@/components/dialogs/DialogConfirmDeleteTod
 import { auth } from "@/helper/auth";
 import todos from "@/helper/todos";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
+import { addTodoSchema } from "@/types/z.types";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import FieldInfo from "@/components/FieldInfo";
+import clsx from "clsx";
+import { z } from "zod";
+
+const searchParamsSchema = z.object({
+  display: z.enum(["all", "complete", "incomplete"]).catch("all"),
+});
+
+// type searchParams = z.infer<typeof searchParamsSchema>;
 
 export const Route = createFileRoute("/")({
+  validateSearch: searchParamsSchema,
   beforeLoad: () => {
     const user = auth.getUserId();
     if (!user) {
@@ -25,8 +37,9 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { data: todosList, isLoading, error } = useGetTodos();
+  const { display } = Route.useSearch();
 
+  const { data: todosList, isLoading, error } = useGetTodos(display);
   const {
     dialogComponent: DialogComponent,
     dialogProps,
@@ -42,9 +55,21 @@ function HomePage() {
     openDialog(DialogConfirmDeleteTodo, { todoId });
   }
 
+  async function handleTodoComplete(todo: RecordModel, isComplete: boolean) {
+    const userId = auth.getUserId();
+    if (userId) {
+      await todos.update.completion(todo.id, isComplete);
+      invalidateQueries("todos", userId);
+    }
+  }
+  const navigate = useNavigate({ from: Route.fullPath });
   const form = useForm({
     defaultValues: {
       todo: "",
+    },
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChangeAsync: addTodoSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -76,6 +101,21 @@ function HomePage() {
 
   return (
     <main className="max-w-3xl m-auto">
+      <select
+        value={display}
+        onChange={(e) => {
+          // BAD SOLUTION BUT..
+          const newValue = e.target.value as "all" | "complete" | "incomplete";
+
+          navigate({
+            search: (prev) => ({ ...prev, display: newValue }),
+          });
+        }}
+      >
+        <option value="all">Show All</option>
+        <option value="incomplete">Incomplete</option>
+        <option value="complete">Complete</option>
+      </select>
       <form
         className="mb-5"
         onSubmit={async (e) => {
@@ -89,7 +129,6 @@ function HomePage() {
         <div className="flex gap-2">
           <form.Field
             name="todo"
-            // validators={}
             children={(field) => {
               return (
                 <>
@@ -99,7 +138,7 @@ function HomePage() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                  {/* <FieldInfo field={field} /> */}
+                  <FieldInfo fieldMeta={field.state.meta} />
                 </>
               );
             }}
@@ -117,16 +156,25 @@ function HomePage() {
 
       {DialogComponent && <DialogComponent {...dialogProps} />}
 
-      <ul className="underline">
+      <ul className="">
         {todosList?.map((todo) => (
           <li
             key={todo.id}
-            className="hover:cursor-pointer hover:text-secondary flex mb-2 justify-between"
+            className="hover:cursor-pointer hover:text-secondary flex mb-2 justify-between z-0 hover:bg-gray-200"
+            onClick={() => handleOpenDialog(todo)}
           >
-            <p onClick={() => handleOpenDialog(todo)} id="modal-trigger">
+            <p
+              className={clsx(todo.is_complete && "line-through", "z-10")}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTodoComplete(todo, !todo.is_complete);
+              }}
+            >
               {todo.todo} -- {todo.created}{" "}
             </p>
-            <Button onClick={() => handleDeleteTodo(todo.id)}>Delete</Button>
+            <Button onClick={() => handleDeleteTodo(todo.id)} className="z-50">
+              Delete
+            </Button>
           </li>
         ))}
       </ul>

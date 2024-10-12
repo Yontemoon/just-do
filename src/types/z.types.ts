@@ -18,4 +18,8 @@ const SignInSchema = z.object({
   password: z.string().min(1, "Password is required."),
 });
 
-export { SignUpSchema, SignInSchema };
+const addTodoSchema = z.object({
+  todo: z.string().min(1, "Requires at least something!"),
+});
+
+export { SignUpSchema, SignInSchema, addTodoSchema };

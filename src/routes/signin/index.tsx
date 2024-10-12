@@ -18,7 +18,7 @@ import FieldInfo from "@/components/FieldInfo";
 export const Route = createFileRoute("/signin/")({
   beforeLoad: () => {
     if (auth.getUserId()) {
-      throw redirect({ to: "/" });
+      throw redirect({ to: "/", search: { display: "all" } });
     }
   },
 
@@ -38,7 +38,7 @@ function SignIn() {
       try {
         await authAction.login(values.value.email, values.value.password);
 
-        navigate({ to: "/" });
+        navigate({ to: "/", search: { display: "all" } });
       } catch (error) {
         setServerValidation("Email or password is invalid.");
         console.error(error);

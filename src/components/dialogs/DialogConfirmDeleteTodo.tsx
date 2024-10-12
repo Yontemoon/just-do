@@ -2,8 +2,8 @@ import { useDialogStore } from "@/store/useDialogStore";
 import Dialog from "../Dialog";
 import Button from "../Button";
 import { pb } from "@/lib/pocketbase";
-import { useQueryClient } from "@tanstack/react-query";
 import { auth } from "@/helper/auth";
+import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 
 type PropTypes = {
   todoId: string;
@@ -11,7 +11,8 @@ type PropTypes = {
 
 const DialogConfirmDeleteTodo = ({ todoId }: PropTypes) => {
   const { closeDialog } = useDialogStore();
-  const queryClient = useQueryClient();
+
+  const invalidateQuery = useInvalidateQueries();
 
   return (
     <Dialog>
@@ -20,9 +21,11 @@ const DialogConfirmDeleteTodo = ({ todoId }: PropTypes) => {
         <Button
           onClick={async () => {
             const userId = auth.getUserId();
-            await pb.collection("todos").delete(todoId);
-            queryClient.invalidateQueries({ queryKey: ["todos", userId] });
-            closeDialog();
+            if (userId) {
+              await pb.collection("todos").delete(todoId);
+              invalidateQuery("todos", userId);
+              closeDialog();
+            }
           }}
         >
           Confirm
