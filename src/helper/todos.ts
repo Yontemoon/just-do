@@ -1,5 +1,6 @@
 import { pb } from "@/lib/pocketbase";
-import { parseDate } from "./utils";
+import { parseDate, createSetHash } from "./utils";
+import { RecordModel } from "pocketbase";
 
 const todos = {
   list: async function (
@@ -7,36 +8,41 @@ const todos = {
     date_all: boolean,
     date?: string | undefined
   ) {
+    let data = [] as RecordModel[];
     if (date_all) {
       if (display === "all") {
-        return pb.collection("todos").getFullList({
+        data = await pb.collection("todos").getFullList({
           sort: "-created",
         });
       } else if (display === "complete") {
-        return pb.collection("todos").getFullList({
+        data = await pb.collection("todos").getFullList({
           sort: "-created",
           filter: `is_complete = true`,
         });
       } else {
-        return pb.collection("todos").getFullList({
+        data = await pb.collection("todos").getFullList({
           sort: "-created",
           filter: `is_complete = false`,
         });
       }
+    } else {
+      if (display === "all") {
+        data = await pb.collection("todos").getFullList({
+          sort: "-created",
+          filter: `date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
+        });
+      } else {
+        const isComplete = display === "complete" ? true : false;
+        data = await pb.collection("todos").getFullList({
+          sort: "-created",
+          filter: `is_complete = ${isComplete} && date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
+        });
+      }
     }
 
-    if (display === "all") {
-      return pb.collection("todos").getFullList({
-        sort: "-created",
-        filter: `date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
-      });
-    } else {
-      const isComplete = display === "complete" ? true : false;
-      return pb.collection("todos").getFullList({
-        sort: "-created",
-        filter: `is_complete = ${isComplete} && date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
-      });
-    }
+    const hashSet = createSetHash(data);
+    console.log(hashSet);
+    return { data, hashSet };
   },
   create: async function (todo: string, date: string, user: string) {
     const parsedDate = parseDate(date);

@@ -1,4 +1,5 @@
 import { format, addDays, subDays, parse } from "date-fns";
+import { RecordModel } from "pocketbase";
 
 const parseDate = (dateString: string): Date => {
   return parse(dateString, "yyyy-MM-dd", new Date());
@@ -20,4 +21,21 @@ const dateUtils = {
   },
 };
 
-export { dateUtils, parseDate };
+const stringHash = (input: string): string[] => {
+  const hashtagRegex = /#([\w\s]+)/gi;
+  const matches = input.match(hashtagRegex) || [];
+  console.log(matches);
+  return matches.map((tag) => tag.slice(1).toLowerCase());
+};
+
+const createSetHash = (data: RecordModel[]): string[] => {
+  const hashtags = new Set<string>();
+  data.forEach((result) => {
+    const todoHash = stringHash(result.todo);
+    todoHash.forEach((tag) => hashtags.add(tag));
+  });
+  console.log("hashtags", hashtags);
+  return Array.from(hashtags);
+};
+
+export { dateUtils, parseDate, stringHash, createSetHash };
