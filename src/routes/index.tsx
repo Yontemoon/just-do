@@ -18,6 +18,7 @@ import clsx from "clsx";
 import { dateUtils } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import Switch from "@/components/Switch";
+import AddIcon from "@/components/icons/AddIcon";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -35,11 +36,11 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const { display, date, date_all } = Route.useSearch();
   const {
-    data: todosList,
+    data: todosInfo,
     isLoading,
     error,
   } = useGetTodos(display, date_all, date);
-  console.log(todosList);
+  console.log(todosInfo);
   const {
     dialogComponent: DialogComponent,
     dialogProps,
@@ -192,6 +193,8 @@ function HomePage() {
               return (
                 <>
                   <Input
+                    autoFocus
+                    autoComplete="off"
                     id={field.name}
                     name={field.name}
                     value={field.state.value}
@@ -206,7 +209,7 @@ function HomePage() {
             selector={(state) => [state.canSubmit, state.isSubmitted]}
             children={([canSubmit, isSubmitting]) => (
               <Button type="submit" disabled={!canSubmit}>
-                {isSubmitting ? "Adding..." : "Add"}
+                {isSubmitting ? "Adding..." : <AddIcon />}
               </Button>
             )}
           />
@@ -217,39 +220,49 @@ function HomePage() {
       {isLoading ? (
         <Loader />
       ) : (
-        <ul className="">
-          {!todosList || todosList.length === 0 ? (
-            <div>Nothing to see here...</div>
-          ) : (
-            todosList?.map((todo) => (
-              <div className="flex justify-between mb-2 " key={todo.id}>
-                <li
-                  className="hover:cursor-pointer hover:text-secondary z-0 hover:bg-gray-200 w-full"
-                  onClick={() => handleOpenDialog(todo)}
-                >
-                  <span
-                    className={clsx(todo.is_complete && "line-through", "z-10")}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTodoComplete(todo, !todo.is_complete);
-                    }}
+        <>
+          <ul className="flex gap-3">
+            {todosInfo?.hashSet.map((hash, index) => (
+              <li key={index}>#{hash}</li>
+            ))}
+          </ul>
+          <ul className="">
+            {!todosInfo?.data || todosInfo.data.length === 0 ? (
+              <div>Nothing to see here...</div>
+            ) : (
+              todosInfo.data.map((todo) => (
+                <div className="flex justify-between mb-2 " key={todo.id}>
+                  <li
+                    className="hover:cursor-pointer hover:text-secondary z-0 hover:bg-gray-200 w-full px-4 py-2 mr-1"
+                    onClick={() => handleOpenDialog(todo)}
                   >
-                    {todo.todo} --{" "}
-                    {todo.date_set
-                      ? dateUtils.displayDate(todo.date_set)
-                      : "NOTHING"}{" "}
-                  </span>
-                </li>
-                <Button
-                  onClick={() => handleDeleteTodo(todo.id)}
-                  className="z-50"
-                >
-                  Delete
-                </Button>
-              </div>
-            ))
-          )}
-        </ul>
+                    <span
+                      className={clsx(
+                        todo.is_complete && "line-through",
+                        "z-10"
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTodoComplete(todo, !todo.is_complete);
+                      }}
+                    >
+                      {todo.todo} --{" "}
+                      {todo.date_set
+                        ? dateUtils.displayDate(todo.date_set)
+                        : "NOTHING"}{" "}
+                    </span>
+                  </li>
+                  <Button
+                    onClick={() => handleDeleteTodo(todo.id)}
+                    className="z-50"
+                  >
+                    Delete
+                  </Button>
+                </div>
+              ))
+            )}
+          </ul>
+        </>
       )}
     </main>
   );

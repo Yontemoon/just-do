@@ -27,7 +27,8 @@ const HomePageSPSchema = z
   .object({
     display: z.enum(["all", "complete", "incomplete"]).catch("all"),
     date_all: z.boolean().catch(() => false),
-    date: z.string().optional(),
+    date: z.string().optional().default(dateUtils.getToday()),
+    hashtag: z.string().optional(),
   })
   .refine(
     (data) => {

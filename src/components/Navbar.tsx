@@ -4,6 +4,7 @@ import { authAction } from "@/helper/auth";
 import Button from "./Button";
 
 import useUser from "@/hooks/useUser";
+import { dateUtils } from "@/helper/utils";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -13,7 +14,15 @@ const Navbar = () => {
     <nav>
       <ul className="flex justify-between">
         <li>
-          <Link to="/" className="[&.active]:font-bold">
+          <Link
+            to="/"
+            search={{
+              display: "all",
+              date: dateUtils.getToday(),
+              date_all: false,
+            }}
+            className="[&.active]:font-bold"
+          >
             Home
           </Link>{" "}
         </li>
