@@ -11,41 +11,16 @@ import DialogConfirmDeleteTodo from "@/components/dialogs/DialogConfirmDeleteTod
 import { auth } from "@/helper/auth";
 import todos from "@/helper/todos";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
-import { addTodoSchema } from "@/types/z.types";
+import { addTodoSchema, HomePageSPSchema } from "@/types/z.types";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import FieldInfo from "@/components/FieldInfo";
 import clsx from "clsx";
-import { z } from "zod";
 import { dateUtils } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import Switch from "@/components/Switch";
 
-const searchParamsSchema = z
-  .object({
-    display: z.enum(["all", "complete", "incomplete"]).catch("all"),
-    date_all: z.boolean().catch(() => false),
-    date: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.date_all) {
-        return true;
-      }
-      return !!data.date;
-    },
-    {
-      message: "Date is required when date_all is false",
-      path: ["date"],
-    }
-  )
-  .transform((data) => ({
-    ...data,
-    date: data.date_all ? undefined : data.date || dateUtils.getToday(),
-  }));
-// type searchParams = z.infer<typeof searchParamsSchema>;
-
 export const Route = createFileRoute("/")({
-  validateSearch: searchParamsSchema,
+  validateSearch: HomePageSPSchema,
   beforeLoad: () => {
     const user = auth.getUserId();
     if (!user) {
@@ -59,13 +34,12 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { display, date, date_all } = Route.useSearch();
-  console.log(display, date, date_all);
-
   const {
     data: todosList,
     isLoading,
     error,
   } = useGetTodos(display, date_all, date);
+  console.log(todosList);
   const {
     dialogComponent: DialogComponent,
     dialogProps,
@@ -94,6 +68,15 @@ function HomePage() {
       search: (prev) => ({
         ...prev,
         date: dateUtils.getYesterday(prev.date as string),
+      }),
+    });
+  }
+
+  function handleToday() {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        date: dateUtils.getToday(),
       }),
     });
   }
@@ -185,6 +168,9 @@ function HomePage() {
       {!date_all && (
         <>
           <Button onClick={handleYesterday}>Yesterday</Button>
+          {date !== dateUtils.getToday() && (
+            <Button onClick={handleToday}>Today</Button>
+          )}
           <Button onClick={handleTomorrow}>Tomorrow</Button>
         </>
       )}
@@ -233,7 +219,7 @@ function HomePage() {
       ) : (
         <ul className="">
           {!todosList || todosList.length === 0 ? (
-            <div>Nothing in your list...</div>
+            <div>Nothing to see here...</div>
           ) : (
             todosList?.map((todo) => (
               <div className="flex justify-between mb-2 " key={todo.id}>
@@ -248,7 +234,10 @@ function HomePage() {
                       handleTodoComplete(todo, !todo.is_complete);
                     }}
                   >
-                    {todo.todo} -- {todo.created}{" "}
+                    {todo.todo} --{" "}
+                    {todo.date_set
+                      ? dateUtils.displayDate(todo.date_set)
+                      : "NOTHING"}{" "}
                   </span>
                 </li>
                 <Button

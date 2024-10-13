@@ -1,4 +1,5 @@
 import { pb } from "@/lib/pocketbase";
+import { parseDate } from "./utils";
 
 const todos = {
   list: async function (
@@ -8,26 +9,29 @@ const todos = {
   ) {
     if (date_all) {
       return pb.collection("todos").getFullList({
-        sort: "-date_set",
+        sort: "-created",
       });
-    } else if (display === "all") {
+    }
+
+    if (display === "all") {
       return pb.collection("todos").getFullList({
-        sort: "-date_set",
+        sort: "-created",
         filter: `date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
       });
     } else {
-      const isComplete = display === "complete" ? false : true;
+      const isComplete = display === "complete" ? true : false;
       return pb.collection("todos").getFullList({
-        sort: "-date_set",
-        filter: `is_complete = ${isComplete}`,
+        sort: "-created",
+        filter: `is_complete = ${isComplete} && date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
       });
     }
   },
   create: async function (todo: string, date: string, user: string) {
+    const parsedDate = parseDate(date);
     const record = await pb.collection("todos").create({
       todo: todo,
       user: user,
-      date_set: date,
+      date_set: parsedDate,
     });
     return record;
   },

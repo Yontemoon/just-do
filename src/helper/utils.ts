@@ -20,4 +20,4 @@ const dateUtils = {
   },
 };
 
-export { dateUtils };
+export { dateUtils, parseDate };
