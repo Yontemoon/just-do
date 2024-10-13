@@ -1,3 +1,4 @@
+import { dateUtils } from "@/helper/utils";
 import { z } from "zod";
 
 const SignUpSchema = z
@@ -22,4 +23,27 @@ const addTodoSchema = z.object({
   todo: z.string().min(1, "Requires at least something!"),
 });
 
-export { SignUpSchema, SignInSchema, addTodoSchema };
+const HomePageSPSchema = z
+  .object({
+    display: z.enum(["all", "complete", "incomplete"]).catch("all"),
+    date_all: z.boolean().catch(() => false),
+    date: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.date_all) {
+        return true;
+      }
+      return !!data.date;
+    },
+    {
+      message: "Date is required when date_all is false",
+      path: ["date"],
+    }
+  )
+  .transform((data) => ({
+    ...data,
+    date: data.date_all ? undefined : data.date || dateUtils.getToday(),
+  }));
+
+export { SignUpSchema, SignInSchema, addTodoSchema, HomePageSPSchema };
