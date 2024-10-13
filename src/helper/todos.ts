@@ -8,9 +8,21 @@ const todos = {
     date?: string | undefined
   ) {
     if (date_all) {
-      return pb.collection("todos").getFullList({
-        sort: "-created",
-      });
+      if (display === "all") {
+        return pb.collection("todos").getFullList({
+          sort: "-created",
+        });
+      } else if (display === "complete") {
+        return pb.collection("todos").getFullList({
+          sort: "-created",
+          filter: `is_complete = true`,
+        });
+      } else {
+        return pb.collection("todos").getFullList({
+          sort: "-created",
+          filter: `is_complete = false`,
+        });
+      }
     }
 
     if (display === "all") {
