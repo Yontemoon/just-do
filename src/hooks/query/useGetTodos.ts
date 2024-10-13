@@ -2,12 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import todos from "@/helper/todos";
 import { auth } from "@/helper/auth";
 
-function useGetTodos(filter: "all" | "complete" | "incomplete") {
+function useGetTodos(
+  display: "all" | "complete" | "incomplete",
+  date_all: boolean,
+  date: string | undefined
+) {
   const userId = auth.getUserId();
   const { data, isLoading, error } = useQuery({
-    queryKey: ["todos", userId, filter],
+    queryKey: ["todos", userId, display, date, date_all],
     queryFn: async () => {
-      const response = await todos.list(filter);
+      const response = await todos.list(display, date_all, date);
       return response;
     },
   });

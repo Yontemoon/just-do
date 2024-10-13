@@ -14,14 +14,14 @@ import { useState } from "react";
 import { SignInSchema } from "@/types/z.types";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import FieldInfo from "@/components/FieldInfo";
-import { date } from "@/helper/utils";
+import { dateUtils } from "@/helper/utils";
 
 export const Route = createFileRoute("/signin/")({
   beforeLoad: () => {
     if (auth.getUserId()) {
       throw redirect({
         to: "/",
-        search: { display: "all", date: date.getToday() },
+        search: { display: "all", date: dateUtils.getToday(), date_all: false },
       });
     }
   },
@@ -44,7 +44,11 @@ function SignIn() {
 
         navigate({
           to: "/",
-          search: { display: "all", date: date.getToday() },
+          search: {
+            display: "all",
+            date: dateUtils.getToday(),
+            date_all: false,
+          },
         });
       } catch (error) {
         setServerValidation("Email or password is invalid.");

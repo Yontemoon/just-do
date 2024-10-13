@@ -1,23 +1,33 @@
 import { pb } from "@/lib/pocketbase";
 
 const todos = {
-  list: async function (filter: "all" | "complete" | "incomplete") {
-    if (filter === "all") {
+  list: async function (
+    display: "all" | "complete" | "incomplete",
+    date_all: boolean,
+    date?: string | undefined
+  ) {
+    if (date_all) {
       return pb.collection("todos").getFullList({
-        sort: "-created",
+        sort: "-date_set",
+      });
+    } else if (display === "all") {
+      return pb.collection("todos").getFullList({
+        sort: "-date_set",
+        filter: `date_set >= "${date} 00:00:00" && date_set <= "${date} 23:59:59"`,
       });
     } else {
-      const isComplete = filter === "complete" ? true : false;
+      const isComplete = display === "complete" ? false : true;
       return pb.collection("todos").getFullList({
-        sort: "-created",
+        sort: "-date_set",
         filter: `is_complete = ${isComplete}`,
       });
     }
   },
-  create: async function (todo: string, user: string) {
+  create: async function (todo: string, date: string, user: string) {
     const record = await pb.collection("todos").create({
       todo: todo,
       user: user,
+      date_set: date,
     });
     return record;
   },

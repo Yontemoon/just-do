@@ -11,6 +11,7 @@ import { SignUpSchema } from "@/types/z.types";
 import { authAction } from "@/helper/auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { dateUtils } from "@/helper/utils";
 
 function FieldInfo({ fieldMeta }: { fieldMeta: FieldMeta | undefined }) {
   if (!fieldMeta) return null;
@@ -30,7 +31,14 @@ function FieldInfo({ fieldMeta }: { fieldMeta: FieldMeta | undefined }) {
 export const Route = createFileRoute("/signup")({
   beforeLoad: () => {
     if (auth.getUserId()) {
-      redirect({ to: "/" });
+      redirect({
+        to: "/",
+        search: {
+          display: "all",
+          date: dateUtils.getToday(),
+          date_all: false,
+        },
+      });
     }
   },
   component: SignUp,
@@ -56,7 +64,14 @@ function SignUp() {
       if (response.status === 400) {
         setServerValidation("Email or password is incorrect.");
       } else {
-        navigate({ to: "/" });
+        navigate({
+          to: "/",
+          search: {
+            date: dateUtils.getToday(),
+            display: "all",
+            date_all: false,
+          },
+        });
       }
     },
     validatorAdapter: zodValidator(),

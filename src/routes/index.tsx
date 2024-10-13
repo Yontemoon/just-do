@@ -16,16 +16,32 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import FieldInfo from "@/components/FieldInfo";
 import clsx from "clsx";
 import { z } from "zod";
-import { date } from "@/helper/utils";
+import { dateUtils } from "@/helper/utils";
+import Loader from "@/components/Loader";
+import Switch from "@/components/Switch";
 
-const searchParamsSchema = z.object({
-  display: z.enum(["all", "complete", "incomplete"]).catch("all"),
-  date: z.string().catch(() => {
-    const today = date.getToday();
-    return today;
-  }),
-});
-
+const searchParamsSchema = z
+  .object({
+    display: z.enum(["all", "complete", "incomplete"]).catch("all"),
+    date_all: z.boolean().catch(() => false),
+    date: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.date_all) {
+        return true;
+      }
+      return !!data.date;
+    },
+    {
+      message: "Date is required when date_all is false",
+      path: ["date"],
+    }
+  )
+  .transform((data) => ({
+    ...data,
+    date: data.date_all ? undefined : data.date || dateUtils.getToday(),
+  }));
 // type searchParams = z.infer<typeof searchParamsSchema>;
 
 export const Route = createFileRoute("/")({
@@ -42,9 +58,14 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { display, date } = Route.useSearch();
+  const { display, date, date_all } = Route.useSearch();
+  console.log(display, date, date_all);
 
-  const { data: todosList, isLoading, error } = useGetTodos(display);
+  const {
+    data: todosList,
+    isLoading,
+    error,
+  } = useGetTodos(display, date_all, date);
   const {
     dialogComponent: DialogComponent,
     dialogProps,
@@ -70,13 +91,19 @@ function HomePage() {
 
   function handleYesterday() {
     navigate({
-      search: (prev) => ({ ...prev, date: date.getYesterday(prev.date) }),
+      search: (prev) => ({
+        ...prev,
+        date: dateUtils.getYesterday(prev.date as string),
+      }),
     });
   }
 
   function handleTomorrow() {
     navigate({
-      search: (prev) => ({ ...prev, date: date.getTomorrow(prev.date) }),
+      search: (prev) => ({
+        ...prev,
+        date: dateUtils.getTomorrow(prev.date as string),
+      }),
     });
   }
   const navigate = useNavigate({ from: Route.fullPath });
@@ -91,15 +118,19 @@ function HomePage() {
     onSubmit: async ({ value }) => {
       try {
         const currentUser = auth.getUserId();
-        console.log(currentUser);
+
         if (currentUser) {
-          const response = await todos.create(value.todo, currentUser);
+          const response = await todos.create(
+            value.todo,
+            date || dateUtils.getToday(),
+            currentUser
+          );
           if (response) {
             invalidateQueries("todos", currentUser);
           }
           return response;
         } else {
-          console.log("no user");
+          navigate({ to: "/signin" });
         }
       } catch (error) {
         console.error(error);
@@ -112,29 +143,52 @@ function HomePage() {
     return <div>{error.message}</div>;
   }
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <main className="max-w-3xl m-auto">
-      <select
-        value={display}
-        onChange={(e) => {
-          // BAD SOLUTION BUT..
-          const newValue = e.target.value as "all" | "complete" | "incomplete";
+      <p>{date}</p>
+      <div className="flex justify-between">
+        <div>
+          <Label>Filter</Label>
+          <select
+            value={display}
+            onChange={(e) => {
+              // BAD SOLUTION BUT..
+              const newValue = e.target.value as
+                | "all"
+                | "complete"
+                | "incomplete";
 
-          navigate({
-            search: (prev) => ({ ...prev, display: newValue }),
-          });
-        }}
-      >
-        <option value="all">Show All</option>
-        <option value="incomplete">Incomplete</option>
-        <option value="complete">Complete</option>
-      </select>
-      <Button onClick={handleYesterday}>Yesterday</Button>
-      <Button onClick={handleTomorrow}>Tomorrow</Button>
+              navigate({
+                search: (prev) => ({ ...prev, display: newValue }),
+              });
+            }}
+          >
+            <option value="all">Show All</option>
+            <option value="incomplete">Incomplete</option>
+            <option value="complete">Complete</option>
+          </select>
+        </div>
+        <Switch
+          checked={date_all}
+          onChange={(checked) => {
+            navigate({
+              search: (prev) => ({
+                ...prev,
+                date_all: checked,
+                date: checked ? undefined : dateUtils.getToday(),
+              }),
+            });
+          }}
+        />
+      </div>
+
+      {!date_all && (
+        <>
+          <Button onClick={handleYesterday}>Yesterday</Button>
+          <Button onClick={handleTomorrow}>Tomorrow</Button>
+        </>
+      )}
+
       <form
         className="mb-5"
         onSubmit={async (e) => {
@@ -174,31 +228,40 @@ function HomePage() {
       </form>
 
       {DialogComponent && <DialogComponent {...dialogProps} />}
-
-      <ul className="">
-        {todosList?.map((todo) => (
-          <div className="flex justify-between mb-2 ">
-            <li
-              key={todo.id}
-              className="hover:cursor-pointer hover:text-secondary z-0 hover:bg-gray-200 w-full"
-              onClick={() => handleOpenDialog(todo)}
-            >
-              <span
-                className={clsx(todo.is_complete && "line-through", "z-10")}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleTodoComplete(todo, !todo.is_complete);
-                }}
-              >
-                {todo.todo} -- {todo.created}{" "}
-              </span>
-            </li>
-            <Button onClick={() => handleDeleteTodo(todo.id)} className="z-50">
-              Delete
-            </Button>
-          </div>
-        ))}
-      </ul>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <ul className="">
+          {!todosList || todosList.length === 0 ? (
+            <div>Nothing in your list...</div>
+          ) : (
+            todosList?.map((todo) => (
+              <div className="flex justify-between mb-2 " key={todo.id}>
+                <li
+                  className="hover:cursor-pointer hover:text-secondary z-0 hover:bg-gray-200 w-full"
+                  onClick={() => handleOpenDialog(todo)}
+                >
+                  <span
+                    className={clsx(todo.is_complete && "line-through", "z-10")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTodoComplete(todo, !todo.is_complete);
+                    }}
+                  >
+                    {todo.todo} -- {todo.created}{" "}
+                  </span>
+                </li>
+                <Button
+                  onClick={() => handleDeleteTodo(todo.id)}
+                  className="z-50"
+                >
+                  Delete
+                </Button>
+              </div>
+            ))
+          )}
+        </ul>
+      )}
     </main>
   );
 }
