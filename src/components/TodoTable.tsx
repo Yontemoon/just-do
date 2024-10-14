@@ -14,6 +14,8 @@ import { dateUtils } from "@/helper/utils";
 import clsx from "clsx";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogEditTodo from "./dialogs/DialogEditTodo";
+import Button from "./Button";
+import DialogConfirmDeleteTodo from "./dialogs/DialogConfirmDeleteTodo";
 
 const columnHelper = createColumnHelper<RecordModel>();
 
@@ -49,11 +51,27 @@ const column = [
     },
   }),
   columnHelper.accessor("is_complete", {
-    cell: (info) => info.cell.getValue().toString(),
+    cell: (info) => <span>{info.cell.getValue().toString()}</span>
   }),
   columnHelper.accessor("date_set", {
-    cell: (info) => dateUtils.displayDate(info.getValue()),
+    cell: (info) => <span>{dateUtils.displayDate(info.getValue())}</span>
   }),
+  columnHelper.accessor("delete_action", {
+    cell: function CellDelete(info) {
+      const {openDialog} = useDialogStore()
+      return (
+        <Button 
+          className="z-50"
+        onClick={(e)=> {
+          e.stopPropagation()
+          openDialog(DialogConfirmDeleteTodo, {todoId: info.row.original.id})
+          
+        }}>
+          Delete
+        </Button>
+      )
+    }
+  })
 ];
 
 type PropTypes = {
@@ -105,7 +123,7 @@ const TodoTable = ({ tableData }: PropTypes) => {
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                className="hover:bg-gray-300 transition-colors duration-150 hover:cursor-pointer"
+                className="hover:bg-gray-300 transition-colors duration-150 hover:cursor-pointer z-10"
                 onClick={() => handleOpenDialog(row.original)}
               >
                 {row.getVisibleCells().map((cell) => {
