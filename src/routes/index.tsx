@@ -19,6 +19,7 @@ import { dateUtils } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import Switch from "@/components/Switch";
 import AddIcon from "@/components/icons/AddIcon";
+import TodoTable from "@/components/TodoTable";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -40,7 +41,7 @@ function HomePage() {
     isLoading,
     error,
   } = useGetTodos(display, date_all, date);
-  console.log(todosInfo);
+
   const {
     dialogComponent: DialogComponent,
     dialogProps,
@@ -262,6 +263,7 @@ function HomePage() {
               ))
             )}
           </ul>
+          {todosInfo?.data && <TodoTable tableData={todosInfo?.data} />}
         </>
       )}
     </main>
