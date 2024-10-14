@@ -41,7 +41,7 @@ const todos = {
     }
 
     const hashSet = createSetHash(data);
-    console.log(hashSet);
+
     return { data, hashSet };
   },
   create: async function (todo: string, date: string, user: string) {

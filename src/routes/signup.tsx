@@ -55,7 +55,6 @@ function SignUp() {
       confirmPassword: "",
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
       const response = await authAction.signUp(
         value.email,
         value.password,

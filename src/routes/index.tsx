@@ -42,11 +42,7 @@ function HomePage() {
     error,
   } = useGetTodos(display, date_all, date);
 
-  const {
-    dialogComponent: DialogComponent,
-    dialogProps,
-    openDialog,
-  } = useDialogStore();
+  const { openDialog } = useDialogStore();
   const invalidateQueries = useInvalidateQueries();
 
   function handleOpenDialog(todo: RecordModel) {
@@ -217,12 +213,11 @@ function HomePage() {
         </div>
       </form>
 
-      {DialogComponent && <DialogComponent {...dialogProps} />}
       {isLoading ? (
         <Loader />
       ) : (
         <>
-          <ul className="flex gap-3">
+          <ul className="flex flex-wrap gap-3 mb-4">
             {todosInfo?.hashSet.map((hash, index) => (
               <li key={index}>#{hash}</li>
             ))}

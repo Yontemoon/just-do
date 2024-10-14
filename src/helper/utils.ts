@@ -24,7 +24,7 @@ const dateUtils = {
 const stringHash = (input: string): string[] => {
   const hashtagRegex = /#([\w]+)/g;
   const matches = input.match(hashtagRegex) || [];
-  console.log(matches);
+
   return matches.map((tag) => tag.slice(1).toLowerCase());
 };
 
@@ -32,15 +32,14 @@ const createSetHash = (data: RecordModel[]): string[] => {
   const hashtags = new Set<string>();
   data.forEach((result) => {
     const todoHash = stringHash(result.todo);
-    
-    todoHash.forEach(element => {
+
+    todoHash.forEach((element) => {
       if (!hashtags.has(element)) {
-        hashtags.add(element)
+        hashtags.add(element);
       }
     });
-
   });
-  console.log("hashtags", hashtags);
+
   return Array.from(hashtags);
 };
 
