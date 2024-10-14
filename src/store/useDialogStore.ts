@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { ComponentType } from "react";
 
 type DialogState = {
-  dialogComponent: ComponentType<any> | null;
+  DialogComponent: ComponentType<any> | null;
   dialogProps?: { [key: string]: unknown };
   openDialog: (
     Component: ComponentType<any>,
@@ -14,10 +14,10 @@ type DialogState = {
 };
 
 export const useDialogStore = create<DialogState>((set, get) => ({
-  dialogComponent: null,
+  DialogComponent: null,
   dialogProps: {},
   openDialog: (Component, props) =>
-    set({ dialogComponent: Component, dialogProps: props }),
-  closeDialog: () => set({ dialogComponent: null, dialogProps: {} }),
-  isDialogOpen: () => get().dialogComponent !== null,
+    set({ DialogComponent: Component, dialogProps: props }),
+  closeDialog: () => set({ DialogComponent: null, dialogProps: {} }),
+  isDialogOpen: () => get().DialogComponent !== null,
 }));

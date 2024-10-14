@@ -30,6 +30,7 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
 
   return (
     <Dialog>
+      <h2>Edit Todo</h2>
       <form
         onSubmit={async (e) => {
           e.preventDefault();

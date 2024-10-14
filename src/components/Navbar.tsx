@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
-import { authAction } from "@/helper/auth";
+// import { useNavigate } from "@tanstack/react-router";
+// import { authAction } from "@/helper/auth";
 import Button from "./Button";
-
 import useUser from "@/hooks/useUser";
 import { dateUtils } from "@/helper/utils";
-
+import { useDialogStore } from "@/store/useDialogStore";
+import DialogConfirmLogout from "./dialogs/DialogConfirmLogout";
 const Navbar = () => {
-  const navigate = useNavigate();
   const user = useUser();
+  const { openDialog } = useDialogStore();
 
   return (
     <nav>
@@ -33,8 +33,9 @@ const Navbar = () => {
             <li>
               <Button
                 onClick={() => {
-                  authAction.logout();
-                  navigate({ to: "/signin" });
+                  openDialog(DialogConfirmLogout);
+                  // authAction.logout();
+                  // navigate({ to: "/signin" });
                 }}
               >
                 Sign Out
