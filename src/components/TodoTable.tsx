@@ -4,7 +4,9 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   Row,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { RecordModel } from "pocketbase";
@@ -97,8 +99,10 @@ const column = [
     cell: (info) => <RowDragHandleCell rowId={info.row.original.id} />,
     size: 60,
     header: "Move",
+    enableSorting: false,
   }),
   columnHelper.accessor("todo", {
+    enableSorting: true,
     cell: function TodoCell(info) {
       const invalidateQueries = useInvalidateQueries();
       async function handleTodoComplete(
@@ -129,10 +133,12 @@ const column = [
     },
   }),
   columnHelper.accessor("is_complete", {
+    enableSorting: true,
     cell: (info) => <span>{info.cell.getValue().toString()}</span>,
   }),
   columnHelper.accessor("date_set", {
     cell: (info) => <span>{dateUtils.displayDate(info.getValue())}</span>,
+    enableSorting: true,
   }),
   columnHelper.accessor("delete_action", {
     cell: function CellDelete(info) {
@@ -151,6 +157,7 @@ const column = [
         </Button>
       );
     },
+    enableSorting: false,
   }),
 ];
 
@@ -160,6 +167,7 @@ type PropTypes = {
 
 const TodoTable = ({ tableData }: PropTypes) => {
   const [data, setData] = useState<RecordModel[]>(() => [...tableData]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const dataIds = useMemo<UniqueIdentifier[]>(() => {
     return data?.map(({ id }) => id);
   }, [data]);
@@ -176,6 +184,11 @@ const TodoTable = ({ tableData }: PropTypes) => {
     debugTable: true,
     debugHeaders: true,
     debugColumns: true,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
   });
 
   function handleDragEnd(event: DragEndEvent) {
@@ -195,6 +208,8 @@ const TodoTable = ({ tableData }: PropTypes) => {
     useSensor(KeyboardSensor, {})
   );
 
+  console.log(table.getState().sorting);
+
   return (
     <>
       {data.length === 0 ? (
@@ -211,13 +226,35 @@ const TodoTable = ({ tableData }: PropTypes) => {
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <th key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
+                    <th key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder ? null : (
+                        <div
+                          onClick={header.column.getToggleSortingHandler()}
+                          className={
+                            header.column.getCanSort()
+                              ? "cursor-pointer select-none"
+                              : ""
+                          }
+                          title={
+                            header.column.getCanSort()
+                              ? header.column.getNextSortingOrder() === "asc"
+                                ? "Sort ascending"
+                                : header.column.getNextSortingOrder() === "desc"
+                                  ? "Sort descending"
+                                  : "Clear sort"
+                              : undefined
+                          }
+                        >
+                          {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
                           )}
+                          {{
+                            asc: " 🔼",
+                            desc: " 🔽",
+                          }[header.column.getIsSorted() as string] ?? null}
+                        </div>
+                      )}
                     </th>
                   ))}
                 </tr>
