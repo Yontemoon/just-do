@@ -103,7 +103,7 @@ function HomePage() {
   }
 
   return (
-    <main className="max-w-3xl m-auto">
+    <div className="max-w-3xl m-auto">
       <p>{date}</p>
       <div className="flex justify-between">
         <div>
@@ -203,6 +203,6 @@ function HomePage() {
           {todosInfo?.data && <TodoTable tableData={todosInfo?.data} />}
         </>
       )}
-    </main>
+    </div>
   );
 }
