@@ -4,17 +4,12 @@ import { useForm } from "@tanstack/react-form";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Label from "@/components/Label";
-import DialogEditTodo from "@/components/dialogs/DialogEditTodo";
-import { useDialogStore } from "@/store/useDialogStore";
-import { RecordModel } from "pocketbase";
-import DialogConfirmDeleteTodo from "@/components/dialogs/DialogConfirmDeleteTodo";
 import { auth } from "@/helper/auth";
 import todos from "@/helper/todos";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 import { addTodoSchema, HomePageSPSchema } from "@/types/z.types";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import FieldInfo from "@/components/FieldInfo";
-import clsx from "clsx";
 import { dateUtils } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import Switch from "@/components/Switch";
@@ -42,24 +37,7 @@ function HomePage() {
     error,
   } = useGetTodos(display, date_all, date);
 
-  const { openDialog } = useDialogStore();
   const invalidateQueries = useInvalidateQueries();
-
-  function handleOpenDialog(todo: RecordModel) {
-    openDialog(DialogEditTodo, { todo });
-  }
-
-  function handleDeleteTodo(todoId: string) {
-    openDialog(DialogConfirmDeleteTodo, { todoId });
-  }
-
-  async function handleTodoComplete(todo: RecordModel, isComplete: boolean) {
-    const userId = auth.getUserId();
-    if (userId) {
-      await todos.update.completion(todo.id, isComplete);
-      invalidateQueries("todos", userId);
-    }
-  }
 
   function handleYesterday() {
     navigate({
@@ -221,42 +199,6 @@ function HomePage() {
             {todosInfo?.hashSet.map((hash, index) => (
               <li key={index}>#{hash}</li>
             ))}
-          </ul>
-          <ul className="">
-            {!todosInfo?.data || todosInfo.data.length === 0 ? (
-              <div>Nothing to see here...</div>
-            ) : (
-              todosInfo.data.map((todo) => (
-                <div className="flex justify-between mb-2 " key={todo.id}>
-                  <li
-                    className="hover:cursor-pointer hover:text-secondary z-0 hover:bg-gray-200 w-full px-4 py-2 mr-1"
-                    onClick={() => handleOpenDialog(todo)}
-                  >
-                    <span
-                      className={clsx(
-                        todo.is_complete && "line-through",
-                        "z-10"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTodoComplete(todo, !todo.is_complete);
-                      }}
-                    >
-                      {todo.todo} --{" "}
-                      {todo.date_set
-                        ? dateUtils.displayDate(todo.date_set)
-                        : "NOTHING"}{" "}
-                    </span>
-                  </li>
-                  <Button
-                    onClick={() => handleDeleteTodo(todo.id)}
-                    className="z-50"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              ))
-            )}
           </ul>
           {todosInfo?.data && <TodoTable tableData={todosInfo?.data} />}
         </>
