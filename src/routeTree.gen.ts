@@ -10,101 +10,137 @@
 
 // Import Routes
 
-import { Route as rootRoute } from "./routes/__root";
-import { Route as SignupImport } from "./routes/signup";
-import { Route as SigninImport } from "./routes/signin";
-import { Route as IndexImport } from "./routes/index";
+import { Route as rootRoute } from './routes/__root'
+import { Route as StatsImport } from './routes/stats'
+import { Route as SignupImport } from './routes/signup'
+import { Route as SigninImport } from './routes/signin'
+import { Route as CalendarImport } from './routes/calendar'
+import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
-const SignupRoute = SignupImport.update({
-  path: "/signup",
+const StatsRoute = StatsImport.update({
+  path: '/stats',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
+
+const SignupRoute = SignupImport.update({
+  path: '/signup',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SigninRoute = SigninImport.update({
-  path: "/signin",
+  path: '/signin',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
+
+const CalendarRoute = CalendarImport.update({
+  path: '/calendar',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
-  path: "/",
+  path: '/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 // Populate the FileRoutesByPath interface
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/signin": {
-      id: "/signin";
-      path: "/signin";
-      fullPath: "/signin";
-      preLoaderRoute: typeof SigninImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/signup": {
-      id: "/signup";
-      path: "/signup";
-      fullPath: "/signup";
-      preLoaderRoute: typeof SignupImport;
-      parentRoute: typeof rootRoute;
-    };
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarImport
+      parentRoute: typeof rootRoute
+    }
+    '/signin': {
+      id: '/signin'
+      path: '/signin'
+      fullPath: '/signin'
+      preLoaderRoute: typeof SigninImport
+      parentRoute: typeof rootRoute
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupImport
+      parentRoute: typeof rootRoute
+    }
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/signin": typeof SigninRoute;
-  "/signup": typeof SignupRoute;
+  '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
+  '/stats': typeof StatsRoute
 }
 
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/signin": typeof SigninRoute;
-  "/signup": typeof SignupRoute;
+  '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
+  '/stats': typeof StatsRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  "/": typeof IndexRoute;
-  "/signin": typeof SigninRoute;
-  "/signup": typeof SignupRoute;
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/calendar': typeof CalendarRoute
+  '/signin': typeof SigninRoute
+  '/signup': typeof SignupRoute
+  '/stats': typeof StatsRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/signin" | "/signup";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/signin" | "/signup";
-  id: "__root__" | "/" | "/signin" | "/signup";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/calendar' | '/signin' | '/signup' | '/stats'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/calendar' | '/signin' | '/signup' | '/stats'
+  id: '__root__' | '/' | '/calendar' | '/signin' | '/signup' | '/stats'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  SigninRoute: typeof SigninRoute;
-  SignupRoute: typeof SignupRoute;
+  IndexRoute: typeof IndexRoute
+  CalendarRoute: typeof CalendarRoute
+  SigninRoute: typeof SigninRoute
+  SignupRoute: typeof SignupRoute
+  StatsRoute: typeof StatsRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarRoute: CalendarRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
-};
+  StatsRoute: StatsRoute,
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 
@@ -115,18 +151,26 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/calendar",
         "/signin",
-        "/signup"
+        "/signup",
+        "/stats"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/calendar": {
+      "filePath": "calendar.tsx"
     },
     "/signin": {
       "filePath": "signin.tsx"
     },
     "/signup": {
       "filePath": "signup.tsx"
+    },
+    "/stats": {
+      "filePath": "stats.tsx"
     }
   }
 }

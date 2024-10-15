@@ -208,8 +208,6 @@ const TodoTable = ({ tableData }: PropTypes) => {
     useSensor(KeyboardSensor, {})
   );
 
-  console.log(table.getState().sorting);
-
   return (
     <>
       {data.length === 0 ? (
