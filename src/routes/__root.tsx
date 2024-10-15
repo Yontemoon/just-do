@@ -1,14 +1,9 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
-import { AuthModel } from "pocketbase";
 import Footer from "@/components/Footer";
 import { useDialogStore } from "@/store/useDialogStore";
 
-interface IRouterContext {
-  user: AuthModel;
-}
-
-export const Route = createRootRouteWithContext<IRouterContext>()({
+export const Route = createRootRoute({
   component: RootComponent,
 });
 
