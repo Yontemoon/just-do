@@ -1,5 +1,5 @@
 // import { TTable } from "@/types/tables.types";
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -17,7 +17,6 @@ import { dateUtils } from "@/helper/utils";
 import clsx from "clsx";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogEditTodo from "./dialogs/DialogEditTodo";
-import Button from "./Button";
 import DialogConfirmDeleteTodo from "./dialogs/DialogConfirmDeleteTodo";
 import {
   DndContext,
@@ -39,6 +38,8 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import IconTrash from "./icons/TrashIcon";
+import { useHover } from "usehooks-ts";
 
 const columnHelper = createColumnHelper<RecordModel>();
 
@@ -103,6 +104,7 @@ const column = [
   }),
   columnHelper.accessor("todo", {
     enableSorting: true,
+    size: 400,
     cell: function TodoCell(info) {
       const invalidateQueries = useInvalidateQueries();
       async function handleTodoComplete(
@@ -132,10 +134,10 @@ const column = [
       );
     },
   }),
-  columnHelper.accessor("is_complete", {
-    enableSorting: true,
-    cell: (info) => <span>{info.cell.getValue().toString()}</span>,
-  }),
+  // columnHelper.accessor("is_complete", {
+  //   enableSorting: true,
+  //   cell: (info) => <span>{info.cell.getValue().toString()}</span>,
+  // }),
   columnHelper.accessor("date_set", {
     cell: (info) => <span>{dateUtils.displayDate(info.getValue())}</span>,
     enableSorting: true,
@@ -143,9 +145,16 @@ const column = [
   columnHelper.accessor("delete_action", {
     cell: function CellDelete(info) {
       const { openDialog } = useDialogStore();
+      const hoverRef = useRef<HTMLDivElement | null>(null);
+      const isHover = useHover(hoverRef);
+
       return (
-        <Button
-          className="z-50"
+        <div
+          ref={hoverRef}
+          className={clsx(
+            "z-50 w-full h-full transition-opacity duration-150 ",
+            isHover ? "opacity-100" : "opacity-0"
+          )}
           onClick={(e) => {
             e.stopPropagation();
             openDialog(DialogConfirmDeleteTodo, {
@@ -153,8 +162,8 @@ const column = [
             });
           }}
         >
-          Delete
-        </Button>
+          <IconTrash />
+        </div>
       );
     },
     enableSorting: false,

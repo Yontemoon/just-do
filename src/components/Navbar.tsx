@@ -24,7 +24,13 @@ const Navbar = () => {
             className="[&.active]:font-bold"
           >
             Home
-          </Link>{" "}
+          </Link>
+          <Link to="/calendar" className="[&.active]:font-bold">
+            Calendar
+          </Link>
+          <Link to="/stats" className="[&.active]:font-bold">
+            Stats
+          </Link>
         </li>
 
         {user ? (
@@ -34,8 +40,6 @@ const Navbar = () => {
               <Button
                 onClick={() => {
                   openDialog(DialogConfirmLogout);
-                  // authAction.logout();
-                  // navigate({ to: "/signin" });
                 }}
               >
                 Sign Out
