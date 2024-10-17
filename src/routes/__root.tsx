@@ -2,9 +2,14 @@ import { Outlet, createRootRoute } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "@/components/Footer";
 import { useDialogStore } from "@/store/useDialogStore";
+import Loader from "@/components/Loader";
+import Error from "@/components/Error";
 
 export const Route = createRootRoute({
   component: RootComponent,
+  loader: Loader,
+  errorComponent: Error,
+  notFoundComponent: Error,
 });
 
 function RootComponent() {
@@ -12,7 +17,7 @@ function RootComponent() {
   return (
     <>
       <Navbar />
-      <main className="min-h-svh">
+      <main>
         <Outlet />
         {DialogComponent && <DialogComponent {...dialogProps} />}
       </main>

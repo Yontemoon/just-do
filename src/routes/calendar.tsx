@@ -1,7 +1,7 @@
 import { auth } from "@/helper/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
+import dayGridPlugin from "@fullcalendar/daygrid";
 
 export const Route = createFileRoute("/calendar")({
   beforeLoad: () => {
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/calendar")({
 function Calendar() {
   return (
     <>
-      <div className="mx-5 my-10">
+      <div className="mx-5 my-10 min-h-screen">
         <FullCalendar
           plugins={[dayGridPlugin]}
           initialView="dayGridMonth"
