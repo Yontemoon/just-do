@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const { display, date, date_all } = Route.useSearch();
+  const { display, date, date_all, hashtag } = Route.useSearch();
   const {
     data: todosInfo,
     isLoading,
@@ -64,6 +64,27 @@ function HomePage() {
         date: dateUtils.getTomorrow(prev.date as string),
       }),
     });
+  }
+
+  function handleHashFilter(hash: string) {
+    if (hash === hashtag) {
+      navigate({
+        search: (prev) => {
+          const newParams = { ...prev };
+          delete newParams.hashtag;
+          return newParams;
+        },
+      });
+    } else {
+      navigate({
+        search: (prev) => {
+          return {
+            ...prev,
+            hashtag: hash,
+          };
+        },
+      });
+    }
   }
   const navigate = useNavigate({ from: Route.fullPath });
   const form = useForm({
@@ -197,7 +218,9 @@ function HomePage() {
         <>
           <ul className="flex flex-wrap gap-3 mb-4">
             {todosInfo?.hashSet.map((hash, index) => (
-              <li key={index}>#{hash}</li>
+              <li key={index} onClick={() => handleHashFilter(hash)}>
+                #{hash}
+              </li>
             ))}
           </ul>
           {todosInfo?.data && <TodoTable tableData={todosInfo?.data} />}
