@@ -1,11 +1,10 @@
 import { Link } from "@tanstack/react-router";
-// import { useNavigate } from "@tanstack/react-router";
-// import { authAction } from "@/helper/auth";
 import Button from "./Button";
 import useUser from "@/hooks/useUser";
-import { dateUtils } from "@/helper/utils";
+import { dateUtils, monthUtils } from "@/helper/utils";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogConfirmLogout from "./dialogs/DialogConfirmLogout";
+
 const Navbar = () => {
   const user = useUser();
   const { openDialog } = useDialogStore();
@@ -25,7 +24,11 @@ const Navbar = () => {
           >
             Home
           </Link>
-          <Link to="/calendar" className="[&.active]:font-bold">
+          <Link
+            to="/calendar/$date"
+            className="[&.active]:font-bold"
+            params={{ date: monthUtils.today() }}
+          >
             Calendar
           </Link>
           <Link to="/stats" className="[&.active]:font-bold">

@@ -16,6 +16,8 @@ import { Route as SignupImport } from './routes/signup'
 import { Route as SigninImport } from './routes/signin'
 import { Route as CalendarImport } from './routes/calendar'
 import { Route as IndexImport } from './routes/index'
+import { Route as CalendarIndexImport } from './routes/calendar.index'
+import { Route as CalendarDateImport } from './routes/calendar.$date'
 
 // Create/Update Routes
 
@@ -42,6 +44,16 @@ const CalendarRoute = CalendarImport.update({
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const CalendarIndexRoute = CalendarIndexImport.update({
+  path: '/',
+  getParentRoute: () => CalendarRoute,
+} as any)
+
+const CalendarDateRoute = CalendarDateImport.update({
+  path: '/$date',
+  getParentRoute: () => CalendarRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -83,48 +95,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StatsImport
       parentRoute: typeof rootRoute
     }
+    '/calendar/$date': {
+      id: '/calendar/$date'
+      path: '/$date'
+      fullPath: '/calendar/$date'
+      preLoaderRoute: typeof CalendarDateImport
+      parentRoute: typeof CalendarImport
+    }
+    '/calendar/': {
+      id: '/calendar/'
+      path: '/'
+      fullPath: '/calendar/'
+      preLoaderRoute: typeof CalendarIndexImport
+      parentRoute: typeof CalendarImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface CalendarRouteChildren {
+  CalendarDateRoute: typeof CalendarDateRoute
+  CalendarIndexRoute: typeof CalendarIndexRoute
+}
+
+const CalendarRouteChildren: CalendarRouteChildren = {
+  CalendarDateRoute: CalendarDateRoute,
+  CalendarIndexRoute: CalendarIndexRoute,
+}
+
+const CalendarRouteWithChildren = CalendarRoute._addFileChildren(
+  CalendarRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
+  '/calendar': typeof CalendarRouteWithChildren
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/stats': typeof StatsRoute
+  '/calendar/$date': typeof CalendarDateRoute
+  '/calendar/': typeof CalendarIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/stats': typeof StatsRoute
+  '/calendar/$date': typeof CalendarDateRoute
+  '/calendar': typeof CalendarIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
+  '/calendar': typeof CalendarRouteWithChildren
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/stats': typeof StatsRoute
+  '/calendar/$date': typeof CalendarDateRoute
+  '/calendar/': typeof CalendarIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendar' | '/signin' | '/signup' | '/stats'
+  fullPaths:
+    | '/'
+    | '/calendar'
+    | '/signin'
+    | '/signup'
+    | '/stats'
+    | '/calendar/$date'
+    | '/calendar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendar' | '/signin' | '/signup' | '/stats'
-  id: '__root__' | '/' | '/calendar' | '/signin' | '/signup' | '/stats'
+  to: '/' | '/signin' | '/signup' | '/stats' | '/calendar/$date' | '/calendar'
+  id:
+    | '__root__'
+    | '/'
+    | '/calendar'
+    | '/signin'
+    | '/signup'
+    | '/stats'
+    | '/calendar/$date'
+    | '/calendar/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CalendarRoute: typeof CalendarRoute
+  CalendarRoute: typeof CalendarRouteWithChildren
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   StatsRoute: typeof StatsRoute
@@ -132,7 +192,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CalendarRoute: CalendarRoute,
+  CalendarRoute: CalendarRouteWithChildren,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   StatsRoute: StatsRoute,
@@ -161,7 +221,11 @@ export const routeTree = rootRoute
       "filePath": "index.tsx"
     },
     "/calendar": {
-      "filePath": "calendar.tsx"
+      "filePath": "calendar.tsx",
+      "children": [
+        "/calendar/$date",
+        "/calendar/"
+      ]
     },
     "/signin": {
       "filePath": "signin.tsx"
@@ -171,6 +235,14 @@ export const routeTree = rootRoute
     },
     "/stats": {
       "filePath": "stats.tsx"
+    },
+    "/calendar/$date": {
+      "filePath": "calendar.$date.tsx",
+      "parent": "/calendar"
+    },
+    "/calendar/": {
+      "filePath": "calendar.index.tsx",
+      "parent": "/calendar"
     }
   }
 }

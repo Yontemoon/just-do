@@ -1,11 +1,22 @@
-import { format, addDays, subDays, parse } from "date-fns";
+import {
+  format,
+  addDays,
+  subDays,
+  parse,
+  startOfMonth,
+  endOfMonth,
+} from "date-fns";
 import { RecordModel } from "pocketbase";
 
 const parseDate = (dateString: string): Date => {
   return parse(dateString, "yyyy-MM-dd", new Date());
 };
 
-const dateUtils = {
+const parseDateYYYYMM = (dateString: string): Date => {
+  return parse(dateString, "yyyy-MM", new Date());
+};
+
+const dayUtils = {
   getToday: (): string => format(new Date(), "yyyy-MM-dd"),
   getTomorrow: (currentDate: string): string => {
     const date = parseDate(currentDate);
@@ -18,6 +29,23 @@ const dateUtils = {
   },
   displayDate: (date: Date): string => {
     return format(date, "PP");
+  },
+};
+
+const monthUtils = {
+  today: () => {
+    const today = new Date();
+    return format(today, "yyyy-MM");
+  },
+  start: (date: string) => {
+    const parsedDate = parseDateYYYYMM(date);
+    const start = startOfMonth(parsedDate);
+    return format(start, "yyyy-MM-dd");
+  },
+  end: (date: string) => {
+    const parsedDate = parseDateYYYYMM(date);
+    const end = endOfMonth(parsedDate);
+    return format(end, "yyyy-MM-dd");
   },
 };
 
@@ -39,8 +67,13 @@ const createSetHash = (data: RecordModel[]): string[] => {
       }
     });
   });
-
   return Array.from(hashtags);
 };
 
-export { dateUtils, parseDate, stringHash, createSetHash };
+export {
+  dayUtils as dateUtils,
+  parseDate,
+  stringHash,
+  createSetHash,
+  monthUtils,
+};

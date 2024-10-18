@@ -1,6 +1,22 @@
 import { pb } from "@/lib/pocketbase";
 import { parseDate, createSetHash } from "./utils";
 import { RecordModel } from "pocketbase";
+import { monthUtils } from "./utils";
+
+export const todosByMonth = async (date: string) => {
+  try {
+    const startDate = monthUtils.start(date);
+    const endDate = monthUtils.end(date);
+    console.log(startDate, endDate);
+    const todos = await pb.collection("todos").getFullList({
+      filter: `date_set >= "${startDate} 00:00:00" && date_set <= "${endDate} 23:59:59"`,
+    });
+    return todos;
+  } catch (error) {
+    console.error(error);
+    throw Error("Error in Todos by Month");
+  }
+};
 
 const todos = {
   list: async function (
@@ -39,9 +55,7 @@ const todos = {
         });
       }
     }
-
     const hashSet = createSetHash(data);
-
     return { data, hashSet };
   },
   create: async function (todo: string, date: string, user: string) {
