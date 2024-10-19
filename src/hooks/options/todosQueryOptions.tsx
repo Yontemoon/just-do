@@ -3,7 +3,7 @@ import { todosByMonth } from "@/helper/todos";
 
 const todosQueryOptions = (date: string) => {
   return queryOptions({
-    queryKey: ["todos", { date }],
+    queryKey: ["calendar-todos"],
     queryFn: () => todosByMonth(date),
   });
 };

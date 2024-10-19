@@ -7,6 +7,7 @@ import Dialog from "../Dialog";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 import { auth } from "@/helper/auth";
 import todos from "@/helper/todos";
+import { useRouterState } from "@tanstack/react-router";
 type PropTypes = {
   todo: RecordModel;
 };
@@ -14,6 +15,7 @@ type PropTypes = {
 const DialogEditTodo = ({ todo }: PropTypes) => {
   const invalidateQuery = useInvalidateQueries();
   const { closeDialog } = useDialogStore();
+  const router = useRouterState();
   const form = useForm({
     defaultValues: {
       todo: todo.todo,
@@ -22,7 +24,12 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
       const userId = auth.getUserId();
       if (userId) {
         await todos.update.todo(todo.id, updatedTodo.todo);
-        invalidateQuery("todos", userId);
+        if (router.location.pathname === "/") {
+          invalidateQuery("todos", userId);
+        } else {
+          invalidateQuery("calendar-todos");
+        }
+
         closeDialog();
       }
     },

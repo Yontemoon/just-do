@@ -104,7 +104,6 @@ export const filterTodosCalendar = (todos: RecordModel[]) => {
       if (acc[todo.date_set].length < 5) {
         acc[todo.date_set].push(todo);
       }
-
       return acc;
     },
     {}
@@ -114,14 +113,13 @@ export const filterTodosCalendar = (todos: RecordModel[]) => {
 };
 
 export const convertCalendarEvents = (todos: Record<string, RecordModel[]>) => {
-  let events: RecordModel[] = [];
-  Object.values(todos).forEach((todo) => {
-    events = events.concat(todo);
-  });
-  const convertEvents = events.map((event) => {
-    return { title: event.todo, date: event.date_set };
-  });
-  return convertEvents;
+  return Object.values(todos).flatMap((todoList) =>
+    todoList.map((event) => ({
+      title: event.todo,
+      date: event.date_set,
+      recordModel: event,
+    }))
+  );
 };
 
 export default todos;
