@@ -94,4 +94,34 @@ const todos = {
   },
 };
 
+export const filterTodosCalendar = (todos: RecordModel[]) => {
+  const groupedTodos = todos.reduce<Record<string, RecordModel[]>>(
+    (acc, todo) => {
+      if (!acc[todo.date_set]) {
+        acc[todo.date_set] = [];
+      }
+
+      if (acc[todo.date_set].length < 5) {
+        acc[todo.date_set].push(todo);
+      }
+
+      return acc;
+    },
+    {}
+  );
+
+  return groupedTodos;
+};
+
+export const convertCalendarEvents = (todos: Record<string, RecordModel[]>) => {
+  let events: RecordModel[] = [];
+  Object.values(todos).forEach((todo) => {
+    events = events.concat(todo);
+  });
+  const convertEvents = events.map((event) => {
+    return { title: event.todo, date: event.date_set };
+  });
+  return convertEvents;
+};
+
 export default todos;

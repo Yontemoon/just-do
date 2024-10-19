@@ -10,6 +10,7 @@ import { monthUtils } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogAddTodo from "@/components/dialogs/DialogAddTodo";
+import { filterTodosCalendar, convertCalendarEvents } from "@/helper/todos";
 
 export const Route = createFileRoute("/calendar/$date")({
   component: CalendarComponent,
@@ -27,6 +28,8 @@ function CalendarComponent() {
   const { data: todos, isLoading } = useSuspenseQuery(
     todosQueryOptions(dateParams)
   );
+  const filteredTodos = filterTodosCalendar(todos);
+  const eventTodos = convertCalendarEvents(filteredTodos);
 
   function handleDateClick(dateInfo: DateClickArg) {
     console.log(dateInfo);
@@ -67,9 +70,7 @@ function CalendarComponent() {
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         weekends={true}
-        events={todos.map((todo) => {
-          return { title: todo.todo, date: todo.date_set };
-        })}
+        events={eventTodos}
         dateClick={handleDateClick}
         eventClassNames={"hover:cursor-pointer"}
         dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100"}
