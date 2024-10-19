@@ -1,10 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 import { todosByMonth } from "@/helper/todos";
 
-const todosQueryOptions = (date: string) => {
+const todosQueryOptions = (yearMonth: string) => {
   return queryOptions({
-    queryKey: ["calendar-todos"],
-    queryFn: () => todosByMonth(date),
+    queryKey: ["calendar-todos", yearMonth],
+    queryFn: () => todosByMonth(yearMonth),
   });
 };
 

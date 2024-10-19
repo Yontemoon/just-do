@@ -5,8 +5,8 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Button from "@/components/Button";
-import { useMemo, useRef } from "react";
-import { monthUtils } from "@/helper/utils";
+import { useRef } from "react";
+import { monthUtils, parseDateYYYYMM } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogAddTodo from "@/components/dialogs/DialogAddTodo";
@@ -30,19 +30,16 @@ function CalendarComponent() {
   const { data: todos, isLoading } = useSuspenseQuery(
     todosQueryOptions(dateParams)
   );
-  const filteredTodos = useMemo(() => filterTodosCalendar(todos), [todos]);
-  const eventTodos = useMemo(
-    () => convertCalendarEvents(filteredTodos),
-    [filteredTodos]
-  );
+
+  const filteredTodos = filterTodosCalendar(todos);
+  const eventTodos = convertCalendarEvents(filteredTodos);
 
   const handleDateClick = (dateInfo: DateClickArg) => {
     console.log(dateInfo);
-    openDialog(DialogAddTodo);
+    openDialog(DialogAddTodo, { date: dateInfo.dateStr });
   };
 
   const handleEventClick = (eventInfo: EventClickArg) => {
-    console.log(eventInfo);
     openDialog(DialogEditTodo, {
       todo: eventInfo.event._def.extendedProps.recordModel,
     });
@@ -50,22 +47,24 @@ function CalendarComponent() {
 
   const handleGoNext = () => {
     const calendarApi = calendarRef?.current?.getApi();
+    calendarApi?.next();
+
     navigate({
       params: (prev) => {
         return { ...prev, date: monthUtils.next(prev.date) };
       },
     });
-    calendarApi?.next();
   };
 
   const handleGoPrev = () => {
     const calendarApi = calendarRef?.current?.getApi();
+    calendarApi?.prev();
+
     navigate({
       params: (prev) => {
         return { ...prev, date: monthUtils.prev(prev.date) };
       },
     });
-    calendarApi?.prev();
   };
 
   if (isLoading) {
@@ -77,6 +76,7 @@ function CalendarComponent() {
       <Button onClick={handleGoPrev}>Go Back</Button>
       <Button onClick={handleGoNext}>Go Forward</Button>
       <FullCalendar
+        initialDate={parseDateYYYYMM(dateParams)}
         headerToolbar={false}
         ref={calendarRef}
         plugins={[dayGridPlugin, interactionPlugin]}

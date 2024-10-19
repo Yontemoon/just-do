@@ -58,6 +58,10 @@ const monthUtils = {
     const prevMonth = addMonths(parsedDate, -1);
     return format(prevMonth, "yyyy-MM");
   },
+  formatYYYYMM: (date: string) => {
+    const parsedDate = parseDate(date);
+    return format(parsedDate, "yyyy-MM");
+  },
 };
 
 const stringHash = (input: string): string[] => {
@@ -87,4 +91,5 @@ export {
   stringHash,
   createSetHash,
   monthUtils,
+  parseDateYYYYMM,
 };
