@@ -8,6 +8,8 @@ import Button from "@/components/Button";
 import { useRef } from "react";
 import { monthUtils } from "@/helper/utils";
 import Loader from "@/components/Loader";
+import { useDialogStore } from "@/store/useDialogStore";
+import DialogAddTodo from "@/components/dialogs/DialogAddTodo";
 
 export const Route = createFileRoute("/calendar/$date")({
   component: CalendarComponent,
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/calendar/$date")({
 
 function CalendarComponent() {
   const calendarRef = useRef<FullCalendar | null>(null);
+  const { openDialog } = useDialogStore();
   const dateParams = Route.useParams().date;
   const navigate = useNavigate({ from: Route.fullPath });
 
@@ -27,6 +30,7 @@ function CalendarComponent() {
 
   function handleDateClick(dateInfo: DateClickArg) {
     console.log(dateInfo);
+    openDialog(DialogAddTodo);
   }
 
   const handleGoNext = () => {
@@ -67,6 +71,8 @@ function CalendarComponent() {
           return { title: todo.todo, date: todo.date_set };
         })}
         dateClick={handleDateClick}
+        eventClassNames={"hover:cursor-pointer"}
+        dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100"}
       />
     </div>
   );
