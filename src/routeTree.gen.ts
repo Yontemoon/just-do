@@ -16,7 +16,6 @@ import { Route as SignupImport } from './routes/signup'
 import { Route as SigninImport } from './routes/signin'
 import { Route as CalendarImport } from './routes/calendar'
 import { Route as IndexImport } from './routes/index'
-import { Route as CalendarIndexImport } from './routes/calendar.index'
 import { Route as CalendarDateImport } from './routes/calendar.$date'
 
 // Create/Update Routes
@@ -44,11 +43,6 @@ const CalendarRoute = CalendarImport.update({
 const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
-} as any)
-
-const CalendarIndexRoute = CalendarIndexImport.update({
-  path: '/',
-  getParentRoute: () => CalendarRoute,
 } as any)
 
 const CalendarDateRoute = CalendarDateImport.update({
@@ -102,13 +96,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalendarDateImport
       parentRoute: typeof CalendarImport
     }
-    '/calendar/': {
-      id: '/calendar/'
-      path: '/'
-      fullPath: '/calendar/'
-      preLoaderRoute: typeof CalendarIndexImport
-      parentRoute: typeof CalendarImport
-    }
   }
 }
 
@@ -116,12 +103,10 @@ declare module '@tanstack/react-router' {
 
 interface CalendarRouteChildren {
   CalendarDateRoute: typeof CalendarDateRoute
-  CalendarIndexRoute: typeof CalendarIndexRoute
 }
 
 const CalendarRouteChildren: CalendarRouteChildren = {
   CalendarDateRoute: CalendarDateRoute,
-  CalendarIndexRoute: CalendarIndexRoute,
 }
 
 const CalendarRouteWithChildren = CalendarRoute._addFileChildren(
@@ -135,16 +120,15 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/stats': typeof StatsRoute
   '/calendar/$date': typeof CalendarDateRoute
-  '/calendar/': typeof CalendarIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendar': typeof CalendarRouteWithChildren
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
   '/stats': typeof StatsRoute
   '/calendar/$date': typeof CalendarDateRoute
-  '/calendar': typeof CalendarIndexRoute
 }
 
 export interface FileRoutesById {
@@ -155,7 +139,6 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/stats': typeof StatsRoute
   '/calendar/$date': typeof CalendarDateRoute
-  '/calendar/': typeof CalendarIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -167,9 +150,8 @@ export interface FileRouteTypes {
     | '/signup'
     | '/stats'
     | '/calendar/$date'
-    | '/calendar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signin' | '/signup' | '/stats' | '/calendar/$date' | '/calendar'
+  to: '/' | '/calendar' | '/signin' | '/signup' | '/stats' | '/calendar/$date'
   id:
     | '__root__'
     | '/'
@@ -178,7 +160,6 @@ export interface FileRouteTypes {
     | '/signup'
     | '/stats'
     | '/calendar/$date'
-    | '/calendar/'
   fileRoutesById: FileRoutesById
 }
 
@@ -223,8 +204,7 @@ export const routeTree = rootRoute
     "/calendar": {
       "filePath": "calendar.tsx",
       "children": [
-        "/calendar/$date",
-        "/calendar/"
+        "/calendar/$date"
       ]
     },
     "/signin": {
@@ -238,10 +218,6 @@ export const routeTree = rootRoute
     },
     "/calendar/$date": {
       "filePath": "calendar.$date.tsx",
-      "parent": "/calendar"
-    },
-    "/calendar/": {
-      "filePath": "calendar.index.tsx",
       "parent": "/calendar"
     }
   }

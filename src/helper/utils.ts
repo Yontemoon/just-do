@@ -5,6 +5,7 @@ import {
   parse,
   startOfMonth,
   endOfMonth,
+  addMonths,
 } from "date-fns";
 import { RecordModel } from "pocketbase";
 
@@ -37,15 +38,25 @@ const monthUtils = {
     const today = new Date();
     return format(today, "yyyy-MM");
   },
-  start: (date: string) => {
+  start: (date: string): string => {
     const parsedDate = parseDateYYYYMM(date);
     const start = startOfMonth(parsedDate);
     return format(start, "yyyy-MM-dd");
   },
-  end: (date: string) => {
+  end: (date: string): string => {
     const parsedDate = parseDateYYYYMM(date);
     const end = endOfMonth(parsedDate);
     return format(end, "yyyy-MM-dd");
+  },
+  next: (date: string): string => {
+    const parsedDate = parseDateYYYYMM(date);
+    const nextMonth = addMonths(parsedDate, 1);
+    return format(nextMonth, "yyyy-MM");
+  },
+  prev: (date: string): string => {
+    const parsedDate = parseDateYYYYMM(date);
+    const prevMonth = addMonths(parsedDate, -1);
+    return format(prevMonth, "yyyy-MM");
   },
 };
 
