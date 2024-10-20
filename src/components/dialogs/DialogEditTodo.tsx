@@ -8,6 +8,9 @@ import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 import { auth } from "@/helper/auth";
 import todos from "@/helper/todos";
 import { useRouterState } from "@tanstack/react-router";
+import IconTrash from "../icons/TrashIcon";
+import { Bounce, toast } from "react-toastify";
+
 type PropTypes = {
   todo: RecordModel;
 };
@@ -15,6 +18,7 @@ type PropTypes = {
 const DialogEditTodo = ({ todo }: PropTypes) => {
   const invalidateQuery = useInvalidateQueries();
   const { closeDialog } = useDialogStore();
+
   const router = useRouterState();
   const form = useForm({
     defaultValues: {
@@ -35,9 +39,32 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
     },
   });
 
+  const handleDeleteTodo = async () => {
+    await todos.delete(todo.id);
+    invalidateQuery("calendar-todos");
+    toast("Deleted", {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+    closeDialog();
+  };
+
   return (
     <Dialog>
-      <h2>Edit Todo</h2>
+      <div className="flex justify-between">
+        <h2>Edit Todo</h2>
+        <IconTrash
+          className="hover:cursor-pointer"
+          onClick={handleDeleteTodo}
+        />
+      </div>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -59,6 +86,7 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
           }}
         />
         <Button type="submit">Submit</Button>
+
         <Button onClick={closeDialog}>Close</Button>
       </form>
     </Dialog>

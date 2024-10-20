@@ -1,7 +1,14 @@
-function IconTrash() {
+import { SVGProps } from "react";
+
+type PropTypes = SVGProps<SVGSVGElement> & {
+  className?: string;
+};
+
+function IconTrash({ className, ...props }: PropTypes) {
   return (
     <svg
-      // className={className}
+      {...props}
+      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="20"
       fill="currentColor"
