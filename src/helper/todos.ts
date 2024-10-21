@@ -92,6 +92,10 @@ const todos = {
     });
     return record;
   },
+  undo: async (originalTodo: RecordModel) => {
+    const record = await pb.collection("todos").create(originalTodo);
+    return record;
+  },
 };
 
 export const filterTodosCalendar = (todos: RecordModel[]) => {

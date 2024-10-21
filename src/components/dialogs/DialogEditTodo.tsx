@@ -42,18 +42,30 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
   const handleDeleteTodo = async () => {
     await todos.delete(todo.id);
     invalidateQuery("calendar-todos");
-    toast("Deleted", {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
+    toast(
+      <div className="flex justify-between">
+        <span>Event Deleted</span>
+        <span onClick={() => handleDeleteUndo()}>Undo</span>
+      </div>,
+      {
+        position: "bottom-right",
+        autoClose: 8000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      }
+    );
     closeDialog();
+  };
+
+  const handleDeleteUndo = async () => {
+    const response = await todos.undo(todo);
+    console.log(response);
+    invalidateQuery("calendar-todos");
   };
 
   return (
