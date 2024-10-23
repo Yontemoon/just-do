@@ -17,7 +17,7 @@ import { dateUtils } from "@/helper/utils";
 import clsx from "clsx";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogEditTodo from "./dialogs/DialogEditTodo";
-import DialogConfirmDeleteTodo from "./dialogs/DialogConfirmDeleteTodo";
+// import DialogConfirmDeleteTodo from "./dialogs/DialogConfirmDeleteTodo";
 import {
   DndContext,
   KeyboardSensor,
@@ -40,6 +40,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import IconTrash from "./icons/TrashIcon";
 import { useHover } from "usehooks-ts";
+import { useDeleteToast } from "@/hooks/useToasts";
 
 const columnHelper = createColumnHelper<RecordModel>();
 
@@ -134,19 +135,19 @@ const column = [
       );
     },
   }),
-  // columnHelper.accessor("is_complete", {
-  //   enableSorting: true,
-  //   cell: (info) => <span>{info.cell.getValue().toString()}</span>,
-  // }),
+
   columnHelper.accessor("date_set", {
     cell: (info) => <span>{dateUtils.displayDate(info.getValue())}</span>,
     enableSorting: true,
   }),
   columnHelper.accessor("delete_action", {
     cell: function CellDelete(info) {
-      const { openDialog } = useDialogStore();
+      // const { openDialog } = useDialogStore();
       const hoverRef = useRef<HTMLDivElement | null>(null);
       const isHover = useHover(hoverRef);
+      const toast = useDeleteToast();
+      const invalidateQueries = useInvalidateQueries();
+      const userId = auth.getUserId();
 
       return (
         <div
@@ -155,11 +156,13 @@ const column = [
             "z-50 w-full h-full transition-opacity duration-150 ",
             isHover ? "opacity-100" : "opacity-0"
           )}
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            openDialog(DialogConfirmDeleteTodo, {
-              todoId: info.row.original.id,
-            });
+            const response = await todos.delete(info.row.original.id);
+            if (response && userId) {
+              invalidateQueries("todos", userId);
+              toast(info.row.original);
+            }
           }}
         >
           <IconTrash />

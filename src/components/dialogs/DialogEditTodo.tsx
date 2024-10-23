@@ -63,8 +63,7 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
   };
 
   const handleDeleteUndo = async () => {
-    const response = await todos.undo(todo);
-    console.log(response);
+    await todos.undo(todo);
     invalidateQuery("calendar-todos");
   };
 

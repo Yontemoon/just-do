@@ -5,7 +5,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Button from "@/components/Button";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { monthUtils, parseDateYYYYMM } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
@@ -30,6 +30,10 @@ function CalendarComponent() {
   const { data: todos, isLoading } = useSuspenseQuery(
     todosQueryOptions(dateParams)
   );
+
+  useEffect(() => {
+    console.log(calendarRef);
+  }, [calendarRef]);
 
   const filteredTodos = filterTodosCalendar(todos);
   const eventTodos = convertCalendarEvents(filteredTodos);
