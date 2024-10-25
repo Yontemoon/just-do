@@ -5,7 +5,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Button from "@/components/Button";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { monthUtils, parseDateYYYYMM } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
@@ -13,6 +13,8 @@ import DialogAddTodo from "@/components/dialogs/DialogAddTodo";
 import { filterTodosCalendar, convertCalendarEvents } from "@/helper/todos";
 import { EventClickArg } from "@fullcalendar/core/index.js";
 import DialogEditTodo from "@/components/dialogs/DialogEditTodo";
+import { RecordModel } from "pocketbase";
+import { format } from "date-fns";
 
 export const Route = createFileRoute("/calendar/$date")({
   component: CalendarComponent,
@@ -31,15 +33,12 @@ function CalendarComponent() {
     todosQueryOptions(dateParams)
   );
 
-  useEffect(() => {
-    console.log(calendarRef);
-  }, [calendarRef]);
-
+  const todosInfo = generateDateInfo(todos);
+  console.log(todosInfo);
   const filteredTodos = filterTodosCalendar(todos);
   const eventTodos = convertCalendarEvents(filteredTodos);
 
   const handleDateClick = (dateInfo: DateClickArg) => {
-    console.log(dateInfo);
     openDialog(DialogAddTodo, { date: dateInfo.dateStr });
   };
 
@@ -76,9 +75,10 @@ function CalendarComponent() {
   }
   return (
     <div>
-      {" "}
-      <Button onClick={handleGoPrev}>Go Back</Button>
-      <Button onClick={handleGoNext}>Go Forward</Button>
+      <div className="flex justify-end gap-4 mb-3">
+        <Button onClick={handleGoPrev}>Go Back</Button>
+        <Button onClick={handleGoNext}>Go Forward</Button>
+      </div>
       <FullCalendar
         initialDate={parseDateYYYYMM(dateParams)}
         headerToolbar={false}
@@ -88,10 +88,37 @@ function CalendarComponent() {
         weekends={true}
         events={eventTodos}
         dateClick={handleDateClick}
+        dayHeaders={true}
         eventClick={handleEventClick}
         eventClassNames={"hover:cursor-pointer"}
-        dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100"}
+        dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100 relative"}
+        dayCellContent={(dayCellInfo) => {
+          const count = todosInfo.get(dayCellInfo.dayNumberText);
+          return (
+            <div className="w-64">
+              <div className="absolute top-0 -right-1/2 w-full">
+                {dayCellInfo.dayNumberText}
+              </div>
+              <div className="absolute bottom-3 ml-2">
+                <span>{count ? count : 0}</span>
+              </div>
+            </div>
+          );
+        }}
       />
     </div>
   );
 }
+
+const generateDateInfo = (todos: RecordModel[]) => {
+  const dateMap = new Map();
+
+  todos.map((todo) => {
+    const day = format(todo.date_set, "d");
+    console.log(todo.date_set);
+    console.log(day);
+    dateMap.set(day, (dateMap.get(day) || 0) + 1);
+  });
+
+  return dateMap;
+};
