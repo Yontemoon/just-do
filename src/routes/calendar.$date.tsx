@@ -93,14 +93,14 @@ function CalendarComponent() {
         eventClassNames={"hover:cursor-pointer"}
         dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100 relative"}
         dayCellContent={(dayCellInfo) => {
-          const count = todosInfo.get(dayCellInfo.dayNumberText);
+          const dayInfo = todosInfo.get(dayCellInfo.dayNumberText);
           return (
             <div className="w-64">
               <div className="absolute top-0 -right-1/2 w-full">
                 {dayCellInfo.dayNumberText}
               </div>
               <div className="absolute bottom-3 ml-2">
-                <span>{count ? count : 0}</span>
+                <span>{dayInfo.count ? dayInfo.count : 0}</span>
               </div>
             </div>
           );
@@ -114,10 +114,17 @@ const generateDateInfo = (todos: RecordModel[]) => {
   const dateMap = new Map();
 
   todos.map((todo) => {
+    
     const day = format(todo.date_set, "d");
     console.log(todo.date_set);
     console.log(day);
-    dateMap.set(day, (dateMap.get(day) || 0) + 1);
+
+    dateMap.set(day, () => {
+
+      return { 
+        count : (dateMap.get(day) || 0) + 1
+      }
+    });
   });
 
   return dateMap;
