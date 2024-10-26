@@ -92,15 +92,29 @@ function CalendarComponent() {
         eventClick={handleEventClick}
         eventClassNames={"hover:cursor-pointer"}
         dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100 relative"}
+        displayEventTime={false}
         dayCellContent={(dayCellInfo) => {
           const dayInfo = todosInfo.get(dayCellInfo.dayNumberText);
+          console.log(dayInfo);
           return (
             <div className="w-64">
               <div className="absolute top-0 -right-1/2 w-full">
                 {dayCellInfo.dayNumberText}
               </div>
               <div className="absolute bottom-3 ml-2">
-                <span>{dayInfo.count ? dayInfo.count : 0}</span>
+                <span>{dayInfo ? dayInfo.count : 0}</span>{" "}
+                <span>
+                  {dayInfo
+                    ? Math.floor(
+                        (Math.round(
+                          (dayInfo.percent_complete / dayInfo.count) * 100
+                        ) /
+                          100) *
+                          100
+                      )
+                    : 0}
+                  %
+                </span>
               </div>
             </div>
           );
@@ -114,16 +128,15 @@ const generateDateInfo = (todos: RecordModel[]) => {
   const dateMap = new Map();
 
   todos.map((todo) => {
-    
     const day = format(todo.date_set, "d");
-    console.log(todo.date_set);
-    console.log(day);
 
-    dateMap.set(day, () => {
-
-      return { 
-        count : (dateMap.get(day) || 0) + 1
-      }
+    const currentEntry = dateMap.get(day);
+    const currentCount = currentEntry ? currentEntry.count : 0;
+    const completionCount = currentEntry ? currentEntry.percent_complete : 0;
+    const isComplete = todo.is_complete;
+    dateMap.set(day, {
+      count: currentCount + 1,
+      percent_complete: isComplete ? completionCount + 1 : completionCount,
     });
   });
 
