@@ -1,12 +1,17 @@
 import { todosQueryOptions } from "@/hooks/options/todosQueryOptions";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Button from "@/components/Button";
 import { useRef } from "react";
-import { monthUtils, parseDateYYYYMM } from "@/helper/utils";
+import {
+  dateToYYYYMM,
+  dateToYYYYMMdd,
+  monthUtils,
+  parseDateYYYYMM,
+} from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogAddTodo from "@/components/dialogs/DialogAddTodo";
@@ -39,6 +44,8 @@ function CalendarComponent() {
   const eventTodos = convertCalendarEvents(filteredTodos);
 
   const handleDateClick = (dateInfo: DateClickArg) => {
+    const target = dateInfo?.jsEvent.target as HTMLElement;
+    if (target.id) return;
     openDialog(DialogAddTodo, { date: dateInfo.dateStr });
   };
 
@@ -112,13 +119,27 @@ function CalendarComponent() {
             args.event._def.extendedProps.recordModel?.is_complete;
           return clsx("hover:cursor-pointer", isComplete && "line-through");
         }}
-        dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100 relative"}
+        dayCellClassNames={
+          "hover:cursor-pointer hover:bg-gray-100 relative z-10"
+        }
         displayEventTime={false}
         dayCellContent={(dayCellInfo) => {
           const dayInfo = todosInfo.get(dayCellInfo.dayNumberText);
           return (
             <div>
-              <div>{dayCellInfo.dayNumberText}</div>
+              <Link
+                to="/"
+                search={{
+                  date: dateToYYYYMMdd(dayCellInfo.date),
+                  display: "all",
+                  date_all: false,
+                }}
+                params={{ date: dateToYYYYMM(dayCellInfo.date) }}
+                id={dateToYYYYMM(dayCellInfo.date)}
+                className="z-30 relative hover:underline "
+              >
+                {dayCellInfo.dayNumberText}
+              </Link>
               <div>
                 <span>{dayInfo ? dayInfo.count : 0}</span>{" "}
                 <span>

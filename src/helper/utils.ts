@@ -17,6 +17,14 @@ const parseDateYYYYMM = (dateString: string): Date => {
   return parse(dateString, "yyyy-MM", new Date());
 };
 
+const dateToYYYYMM = (date: Date): string => {
+  return format(date, "yyyy-MM");
+};
+
+const dateToYYYYMMdd = (date: Date) => {
+  return format(date, "yyyy-MM-dd");
+};
+
 const dayUtils = {
   getToday: (): string => format(new Date(), "yyyy-MM-dd"),
   getTomorrow: (currentDate: string): string => {
@@ -92,4 +100,6 @@ export {
   createSetHash,
   monthUtils,
   parseDateYYYYMM,
+  dateToYYYYMM,
+  dateToYYYYMMdd,
 };
