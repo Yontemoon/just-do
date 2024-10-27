@@ -15,6 +15,7 @@ import { EventClickArg } from "@fullcalendar/core/index.js";
 import DialogEditTodo from "@/components/dialogs/DialogEditTodo";
 import { RecordModel } from "pocketbase";
 import { format } from "date-fns";
+import clsx from "clsx";
 
 export const Route = createFileRoute("/calendar/$date")({
   component: CalendarComponent,
@@ -34,7 +35,6 @@ function CalendarComponent() {
   );
 
   const todosInfo = generateDateInfo(todos);
-  console.log(todosInfo);
   const filteredTodos = filterTodosCalendar(todos);
   const eventTodos = convertCalendarEvents(filteredTodos);
 
@@ -90,18 +90,36 @@ function CalendarComponent() {
         dateClick={handleDateClick}
         dayHeaders={true}
         eventClick={handleEventClick}
-        eventClassNames={"hover:cursor-pointer"}
+        // eventClassNames={clsx(
+        //   "hover:cursor-pointer",
+        //   eventTodos.find((todo) => {
+        //     return todo.recordModel.is_complete === true;
+        //   }) && "line-through"
+        // )}
+        eventContent={(args) => {
+          const isComplete =
+            args.event._def.extendedProps.recordModel?.is_complete;
+          return (
+            <div className="flex m-1 font-semibold text-nowrap max-w-full overflow-hidden whitespace-nowrap ">
+              <span className={clsx(isComplete && "line-through")}>
+                {args.event.title}
+              </span>
+            </div>
+          );
+        }}
+        eventClassNames={(args) => {
+          const isComplete =
+            args.event._def.extendedProps.recordModel?.is_complete;
+          return clsx("hover:cursor-pointer", isComplete && "line-through");
+        }}
         dayCellClassNames={"hover:cursor-pointer hover:bg-gray-100 relative"}
         displayEventTime={false}
         dayCellContent={(dayCellInfo) => {
           const dayInfo = todosInfo.get(dayCellInfo.dayNumberText);
-          console.log(dayInfo);
           return (
-            <div className="w-64">
-              <div className="absolute top-0 -right-1/2 w-full">
-                {dayCellInfo.dayNumberText}
-              </div>
-              <div className="absolute bottom-3 ml-2">
+            <div>
+              <div>{dayCellInfo.dayNumberText}</div>
+              <div>
                 <span>{dayInfo ? dayInfo.count : 0}</span>{" "}
                 <span>
                   {dayInfo

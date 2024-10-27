@@ -10,6 +10,8 @@ import todos from "@/helper/todos";
 import { useRouterState } from "@tanstack/react-router";
 import IconTrash from "../icons/TrashIcon";
 import { Bounce, toast } from "react-toastify";
+import Checkbox from "../Checkbox";
+import Label from "../Label";
 
 type PropTypes = {
   todo: RecordModel;
@@ -23,11 +25,16 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
   const form = useForm({
     defaultValues: {
       todo: todo.todo,
+      isComplete: todo.is_complete,
     },
     onSubmit: async ({ value: updatedTodo }) => {
       const userId = auth.getUserId();
       if (userId) {
-        await todos.update.todo(todo.id, updatedTodo.todo);
+        await todos.update.todo(
+          todo.id,
+          updatedTodo.todo,
+          updatedTodo.isComplete
+        );
         if (router.location.pathname === "/") {
           invalidateQuery("todos", userId);
         } else {
@@ -96,6 +103,24 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
             );
           }}
         />
+        <form.Field
+          name="isComplete"
+          children={(field) => {
+            return (
+              <div className="flex text-center">
+                <Checkbox
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  checked={field.state.value}
+                  onChange={() => field.handleChange(!field.state.value)}
+                />
+                <Label htmlFor={field.name}>Is Complete</Label>
+              </div>
+            );
+          }}
+        />
+
         <Button type="submit">Submit</Button>
 
         <Button onClick={closeDialog}>Close</Button>

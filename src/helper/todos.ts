@@ -74,9 +74,10 @@ const todos = {
       });
       return record;
     },
-    todo: async function (todoId: string, todo: string) {
+    todo: async function (todoId: string, todo: string, isComplete: boolean) {
       const record = await pb.collection("todos").update(todoId, {
         todo: todo,
+        is_complete: isComplete,
       });
       return record;
     },
