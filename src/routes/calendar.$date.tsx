@@ -140,21 +140,21 @@ function CalendarComponent() {
               >
                 {dayCellInfo.dayNumberText}
               </Link>
-              <div>
-                <span>{dayInfo ? dayInfo.count : 0}</span>{" "}
+              {dayInfo && <div>
+                <span>{dayInfo.count || 0}</span>{" "}
                 <span>
-                  {dayInfo
-                    ? Math.floor(
+                  {
+                    Math.floor(
                         (Math.round(
                           (dayInfo.percent_complete / dayInfo.count) * 100
                         ) /
                           100) *
                           100
                       )
-                    : 0}
+                    || 0}
                   %
                 </span>
-              </div>
+              </div>}
             </div>
           );
         }}
