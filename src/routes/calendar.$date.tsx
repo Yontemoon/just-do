@@ -45,8 +45,11 @@ function CalendarComponent() {
 
   const handleDateClick = (dateInfo: DateClickArg) => {
     const target = dateInfo?.jsEvent.target as HTMLElement;
-    if (target.id) return;
-    openDialog(DialogAddTodo, { date: dateInfo.dateStr });
+    if (target.id) {
+      return;
+    } else {
+      openDialog(DialogAddTodo, { date: dateInfo.dateStr });
+    }
   };
 
   const handleEventClick = (eventInfo: EventClickArg) => {
@@ -97,12 +100,6 @@ function CalendarComponent() {
         dateClick={handleDateClick}
         dayHeaders={true}
         eventClick={handleEventClick}
-        // eventClassNames={clsx(
-        //   "hover:cursor-pointer",
-        //   eventTodos.find((todo) => {
-        //     return todo.recordModel.is_complete === true;
-        //   }) && "line-through"
-        // )}
         eventContent={(args) => {
           const isComplete =
             args.event._def.extendedProps.recordModel?.is_complete;
@@ -136,7 +133,7 @@ function CalendarComponent() {
                 }}
                 params={{ date: dateToYYYYMM(dayCellInfo.date) }}
                 id={dateToYYYYMM(dayCellInfo.date)}
-                className="z-30 relative hover:underline "
+                className="z-30 relative hover:underline"
               >
                 {dayCellInfo.dayNumberText}
               </Link>
