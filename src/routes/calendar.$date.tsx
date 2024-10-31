@@ -1,17 +1,12 @@
 import { todosQueryOptions } from "@/hooks/options/todosQueryOptions";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Button from "@/components/Button";
 import { useRef } from "react";
-import {
-  dateToYYYYMM,
-  dateToYYYYMMdd,
-  monthUtils,
-  parseDateYYYYMM,
-} from "@/helper/utils";
+import { dateToYYYYMMdd, monthUtils, parseDateYYYYMM } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogAddTodo from "@/components/dialogs/DialogAddTodo";
@@ -44,7 +39,18 @@ function CalendarComponent() {
   const eventTodos = convertCalendarEvents(filteredTodos);
 
   const handleDateClick = (dateInfo: DateClickArg) => {
-    const target = dateInfo?.jsEvent.target as HTMLElement;
+    const target = dateInfo.jsEvent.target as HTMLElement;
+    if (target.className.includes("top")) {
+      navigate({
+        to: "/",
+        search: {
+          date: dateToYYYYMMdd(dateInfo.date),
+          date_all: false,
+          display: "all",
+        },
+      });
+      return;
+    }
     if (target.id) {
       return;
     } else {
@@ -84,7 +90,7 @@ function CalendarComponent() {
     return <Loader />;
   }
   return (
-    <div>
+    <>
       <div className="flex justify-end gap-4 mb-3">
         <Button onClick={handleGoPrev}>Go Back</Button>
         <Button onClick={handleGoNext}>Go Forward</Button>
@@ -93,6 +99,7 @@ function CalendarComponent() {
         initialDate={parseDateYYYYMM(dateParams)}
         headerToolbar={false}
         ref={calendarRef}
+        viewClassNames={"100vh"}
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         weekends={true}
@@ -122,41 +129,32 @@ function CalendarComponent() {
         displayEventTime={false}
         dayCellContent={(dayCellInfo) => {
           const dayInfo = todosInfo.get(dayCellInfo.dayNumberText);
+
           return (
             <div>
-              <Link
-                to="/"
-                search={{
-                  date: dateToYYYYMMdd(dayCellInfo.date),
-                  display: "all",
-                  date_all: false,
-                }}
-                params={{ date: dateToYYYYMM(dayCellInfo.date) }}
-                id={dateToYYYYMM(dayCellInfo.date)}
-                className="z-30 relative hover:underline"
-              >
-                {dayCellInfo.dayNumberText}
-              </Link>
-              {dayInfo && <div>
-                <span>{dayInfo.count || 0}</span>{" "}
-                <span>
-                  {
-                    Math.floor(
-                        (Math.round(
-                          (dayInfo.percent_complete / dayInfo.count) * 100
-                        ) /
-                          100) *
-                          100
-                      )
-                    || 0}
-                  %
-                </span>
-              </div>}
+              <span>{dayCellInfo.dayNumberText}</span>
+
+              {dayInfo && (
+                <div>
+                  <span>{dayInfo.count || 0}</span>{" "}
+                  <span>
+                    {Math.floor(
+                      (Math.round(
+                        (dayInfo.percent_complete / dayInfo.count) * 100
+                      ) /
+                        100) *
+                        100
+                    ) || 0}
+                    %
+                  </span>
+                </div>
+              )}
+              {/* {isHover && <div>Testing</div>} */}
             </div>
           );
         }}
       />
-    </div>
+    </>
   );
 }
 

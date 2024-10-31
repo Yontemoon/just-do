@@ -15,7 +15,7 @@ export const Route = createFileRoute("/calendar")({
 function Calendar() {
   return (
     <>
-      <div className="mx-5 my-10 min-h-screen">
+      <div className="mx-5 my-10 h-screen">
         <header>Temp header</header>
         <Outlet />
       </div>
