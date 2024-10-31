@@ -208,7 +208,7 @@ const TodoTable = ({ tableData }: PropTypes) => {
       setData((data) => {
         const oldIndex = dataIds.indexOf(active.id);
         const newIndex = dataIds.indexOf(over.id);
-        return arrayMove(data, oldIndex, newIndex); //this is just a splice util
+        return arrayMove(data, oldIndex, newIndex);
       });
     }
   }

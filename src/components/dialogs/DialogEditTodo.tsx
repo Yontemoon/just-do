@@ -36,7 +36,7 @@ const DialogEditTodo = ({ todo }: PropTypes) => {
           updatedTodo.isComplete
         );
         if (router.location.pathname === "/") {
-          invalidateQuery("todos", userId);
+          invalidateQuery("todos");
         } else {
           invalidateQuery("calendar-todos");
         }
