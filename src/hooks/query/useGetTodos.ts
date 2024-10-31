@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import todos from "@/helper/todos";
 import { auth } from "@/helper/auth";
 
+// NO LONGER USING
+// USING OPTIONS INSTEAD FOR INITIAL LOADING PAGES
 function useGetTodos(
   display: "all" | "complete" | "incomplete",
   date_all: boolean,

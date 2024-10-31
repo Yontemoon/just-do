@@ -114,7 +114,7 @@ const column = [
         const userId = auth.getUserId();
         if (userId) {
           await todos.update.completion(todo.id, isComplete);
-          invalidateQueries("todos", userId);
+          invalidateQueries("todos");
         }
       }
 
@@ -159,7 +159,7 @@ const column = [
             e.stopPropagation();
             const response = await todos.delete(info.row.original.id);
             if (response && userId) {
-              invalidateQueries("todos", userId);
+              invalidateQueries("todos");
               toast(info.row.original);
             }
           }}

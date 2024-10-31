@@ -1,11 +1,9 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import useGetTodos from "@/hooks/query/useGetTodos";
 import { useForm } from "@tanstack/react-form";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Label from "@/components/Label";
 import { auth } from "@/helper/auth";
-import todos from "@/helper/todos";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 import { addTodoSchema, HomePageSPSchema } from "@/types/z.types";
 import { zodValidator } from "@tanstack/zod-form-adapter";
@@ -15,6 +13,9 @@ import Loader from "@/components/Loader";
 import Switch from "@/components/Switch";
 import AddIcon from "@/components/icons/AddIcon";
 import TodoTable from "@/components/TodoTable";
+import { todoQueryOptions } from "@/hooks/options/todoQueryOptions";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import todos from "@/helper/todos";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -26,16 +27,27 @@ export const Route = createFileRoute("/")({
       });
     }
   },
+  loaderDeps: ({ search: { date_all, date, display } }) => ({
+    date_all,
+    date,
+    display,
+  }),
+  loader: ({ context: { queryClient }, deps: { date, date_all, display } }) => {
+    return queryClient.ensureQueryData(
+      todoQueryOptions(display, date_all, date)
+    );
+  },
   component: HomePage,
 });
 
 function HomePage() {
   const { display, date, date_all, hashtag } = Route.useSearch();
+
   const {
     data: todosInfo,
     isLoading,
     error,
-  } = useGetTodos(display, date_all, date);
+  } = useSuspenseQuery(todoQueryOptions(display, date_all, date));
 
   const invalidateQueries = useInvalidateQueries();
 
@@ -106,7 +118,7 @@ function HomePage() {
             currentUser
           );
           if (response) {
-            invalidateQueries("todos", currentUser);
+            invalidateQueries("todos");
           }
           return response;
         } else {
