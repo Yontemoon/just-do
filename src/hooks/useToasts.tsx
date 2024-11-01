@@ -3,18 +3,17 @@ import { RecordModel } from "pocketbase";
 import { Bounce, toast } from "react-toastify";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 import { useRouterState } from "@tanstack/react-router";
-import { auth } from "@/helper/auth";
 
 const useDeleteToast = () => {
   const invalidateQuery = useInvalidateQueries();
   const router = useRouterState();
 
   const handleDeleteUndo = async (todo: RecordModel) => {
-    const userId = auth.getUserId() as string;
     await todos.undo(todo);
     const pathname = router.location.pathname;
+    console.log(pathname);
     if (pathname === "/") {
-      invalidateQuery("todos", userId);
+      invalidateQuery("todos");
     } else if (pathname === "/calendar") {
       invalidateQuery("calendar-todos");
     }
