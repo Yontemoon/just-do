@@ -16,6 +16,8 @@ import TodoTable from "@/components/TodoTable";
 import { todoQueryOptions } from "@/hooks/options/todoQueryOptions";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import todos from "@/helper/todos";
+import { useEffect, useState } from "react";
+import clsx from "clsx";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -48,6 +50,20 @@ function HomePage() {
     isLoading,
     error,
   } = useSuspenseQuery(todoQueryOptions(display, date_all, date));
+
+  const [displayedTodos, setDisplayedTodos] = useState(todosInfo.data);
+
+  useEffect(() => {
+    if (!hashtag) {
+      setDisplayedTodos(todosInfo.data);
+    } else {
+      const hashtagPattern = new RegExp(`(^|\\s)#${hashtag}(\\s|$)`);
+      const filteredTodos = todosInfo.data.filter((todo) => {
+        return hashtagPattern.test(todo.todo);
+      });
+      setDisplayedTodos(filteredTodos);
+    }
+  }, [hashtag, todosInfo.data]);
 
   const invalidateQueries = useInvalidateQueries();
 
@@ -168,8 +184,9 @@ function HomePage() {
                 ...prev,
                 date_all: checked,
                 date: checked ? undefined : dateUtils.getToday(),
+                hashtag: undefined,
               }),
-          });
+            });
           }}
         />
       </div>
@@ -230,12 +247,19 @@ function HomePage() {
         <>
           <ul className="flex flex-wrap gap-3 mb-4">
             {todosInfo?.hashSet.map((hash, index) => (
-              <li key={index} onClick={() => handleHashFilter(hash)}>
+              <li
+                key={index}
+                onClick={() => handleHashFilter(hash)}
+                className={clsx(
+                  hashtag === hash && "font-bold",
+                  "transition-all duration-300 hover:cursor-pointer hover:font-semibold p-1"
+                )}
+              >
                 #{hash}
               </li>
             ))}
           </ul>
-          {todosInfo?.data && <TodoTable tableData={todosInfo?.data} />}
+          {displayedTodos && <TodoTable tableData={displayedTodos} />}
         </>
       )}
     </div>
