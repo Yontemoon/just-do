@@ -169,7 +169,7 @@ function HomePage() {
                 date_all: checked,
                 date: checked ? undefined : dateUtils.getToday(),
               }),
-            });
+          });
           }}
         />
       </div>

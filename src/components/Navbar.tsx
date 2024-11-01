@@ -1,13 +1,15 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import Button from "./Button";
 import useUser from "@/hooks/useUser";
 import { dateUtils, monthUtils } from "@/helper/utils";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogConfirmLogout from "./dialogs/DialogConfirmLogout";
+import clsx from "clsx";
 
 const Navbar = () => {
   const user = useUser();
   const { openDialog } = useDialogStore();
+  const location = useLocation();
 
   return (
     <nav>
@@ -20,7 +22,7 @@ const Navbar = () => {
               date: dateUtils.getToday(),
               date_all: false,
             }}
-            className="[&.active]:font-bold"
+            className={clsx(location.pathname === "/" && "font-bold")}
           >
             Home
           </Link>
