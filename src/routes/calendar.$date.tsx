@@ -5,7 +5,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Button from "@/components/Button";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { dateToYYYYMMdd, monthUtils, parseDateYYYYMM } from "@/helper/utils";
 import Loader from "@/components/Loader";
 import { useDialogStore } from "@/store/useDialogStore";
@@ -34,9 +34,13 @@ function CalendarComponent() {
     todosQueryOptions(dateParams)
   );
 
-  const todosInfo = generateDateInfo(todos);
-  const filteredTodos = filterTodosCalendar(todos);
-  const eventTodos = convertCalendarEvents(filteredTodos);
+  const todosInfo = useMemo(() => generateDateInfo(todos), [todos]);
+  console.log(todosInfo);
+  const filteredTodos = useMemo(() => filterTodosCalendar(todos), [todos]);
+  const eventTodos = useMemo(
+    () => convertCalendarEvents(filteredTodos),
+    [filteredTodos]
+  );
 
   const handleDateClick = (dateInfo: DateClickArg) => {
     const target = dateInfo.jsEvent.target as HTMLElement;
@@ -159,7 +163,10 @@ function CalendarComponent() {
 }
 
 const generateDateInfo = (todos: RecordModel[]) => {
-  const dateMap = new Map();
+  const dateMap = new Map<
+    string,
+    { count: number; percent_complete: number }
+  >();
 
   todos.map((todo) => {
     const day = format(todo.date_set, "d");

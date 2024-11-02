@@ -192,13 +192,13 @@ function HomePage() {
       </div>
 
       {!date_all && (
-        <>
+        <div className="flex justify-between mt-1">
           <Button onClick={handleYesterday}>Yesterday</Button>
           {date !== dateUtils.getToday() && (
             <Button onClick={handleToday}>Today</Button>
           )}
           <Button onClick={handleTomorrow}>Tomorrow</Button>
-        </>
+        </div>
       )}
 
       <form

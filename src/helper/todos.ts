@@ -120,8 +120,8 @@ export const filterTodosCalendar = (todos: RecordModel[]) => {
 export const convertCalendarEvents = (todos: Record<string, RecordModel[]>) => {
   return Object.values(todos).flatMap((todoList) =>
     todoList.map((event) => ({
-      title: event.todo,
-      date: event.date_set,
+      title: event.todo as string,
+      date: event.date_set as string,
       recordModel: event,
     }))
   );
