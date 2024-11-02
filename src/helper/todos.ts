@@ -2,6 +2,7 @@ import { pb } from "@/lib/pocketbase";
 import { parseDate, createSetHash } from "./utils";
 import { RecordModel } from "pocketbase";
 import { monthUtils } from "./utils";
+import { TTodos } from "@/types/pocketbase.types";
 
 export const todosByMonth = async (date: string) => {
   try {
@@ -22,9 +23,9 @@ const todos = {
   list: async function (
     display: "all" | "complete" | "incomplete",
     date_all: boolean,
-    date?: string | undefined
+    date?: string
   ) {
-    let data = [] as RecordModel[];
+    let data: (RecordModel & TTodos)[] = [];
     if (date_all) {
       if (display === "all") {
         data = await pb.collection("todos").getFullList({
