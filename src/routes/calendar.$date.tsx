@@ -33,9 +33,9 @@ function CalendarComponent() {
   const { data: todos, isLoading } = useSuspenseQuery(
     todosQueryOptions(dateParams)
   );
-
+  //Why does this rerender when dialog opens?
+  console.log(todos);
   const todosInfo = useMemo(() => generateDateInfo(todos), [todos]);
-  console.log(todosInfo);
   const filteredTodos = useMemo(() => filterTodosCalendar(todos), [todos]);
   const eventTodos = useMemo(
     () => convertCalendarEvents(filteredTodos),
@@ -103,7 +103,7 @@ function CalendarComponent() {
         initialDate={parseDateYYYYMM(dateParams)}
         headerToolbar={false}
         ref={calendarRef}
-        viewClassNames={"100vh"}
+        // viewClassNames={"100vh"}
         plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         weekends={true}

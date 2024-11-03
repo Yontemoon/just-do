@@ -1,8 +1,9 @@
-import { DialogHTMLAttributes, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { ComponentProps } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import { useDialogStore } from "@/store/useDialogStore";
 
-type PropTypes = DialogHTMLAttributes<HTMLDialogElement> & {
+type PropTypes = ComponentProps<"dialog"> & {
   children: React.ReactNode;
 };
 const Dialog = ({ children }: PropTypes) => {

@@ -1,7 +1,8 @@
 import clsx from "clsx";
-import React, { ButtonHTMLAttributes } from "react";
+import React from "react";
+import type { ComponentProps } from "react";
 
-type PropTypes = ButtonHTMLAttributes<HTMLButtonElement> & {
+type PropTypes = ComponentProps<"button"> & {
   children: React.ReactNode;
   className?: string;
 };

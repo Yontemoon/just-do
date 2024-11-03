@@ -50,6 +50,7 @@ function HomePage() {
     isLoading,
     error,
   } = useSuspenseQuery(todoQueryOptions(display, date_all, date));
+  console.log(todosInfo);
 
   const [displayedTodos, setDisplayedTodos] = useState(todosInfo.data);
 
