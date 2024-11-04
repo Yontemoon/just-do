@@ -40,10 +40,6 @@ function CalendarComponent() {
     const filteredTodos = filterTodosCalendar(todos);
     return convertCalendarEvents(filteredTodos);
   }, [todos]);
-  // const eventTodos = useMemo(
-  //   () => convertCalendarEvents(filteredTodos),
-  //   [filteredTodos]
-  // );
 
   const handleDateClick = (dateInfo: DateClickArg) => {
     const target = dateInfo.jsEvent.target as HTMLElement;
