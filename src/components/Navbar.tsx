@@ -28,7 +28,9 @@ const Navbar = () => {
           </Link>
           <Link
             to="/calendar/$date"
-            className="[&.active]:font-bold"
+            className={clsx(
+              location.pathname.includes("/calendar") && "font-bold"
+            )}
             params={{ date: monthUtils.today() }}
           >
             Calendar
