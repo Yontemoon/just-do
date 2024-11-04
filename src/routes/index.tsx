@@ -18,6 +18,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import todos from "@/helper/todos";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
+import useSearchDate from "@/hooks/useSearchDate";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -44,13 +45,15 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { display, date, date_all, hashtag } = Route.useSearch();
+  const { today, tomorrow, yesterday, hashFilter } = useSearchDate();
+  const invalidateQueries = useInvalidateQueries();
+  const navigate = useNavigate({ from: Route.fullPath });
 
   const {
     data: todosInfo,
     isLoading,
     error,
   } = useSuspenseQuery(todoQueryOptions(display, date_all, date));
-  console.log(todosInfo);
 
   const [displayedTodos, setDisplayedTodos] = useState(todosInfo.data);
 
@@ -66,56 +69,6 @@ function HomePage() {
     }
   }, [hashtag, todosInfo.data]);
 
-  const invalidateQueries = useInvalidateQueries();
-
-  function handleYesterday() {
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        date: dateUtils.getYesterday(prev.date as string),
-      }),
-    });
-  }
-
-  function handleToday() {
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        date: dateUtils.getToday(),
-      }),
-    });
-  }
-
-  function handleTomorrow() {
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        date: dateUtils.getTomorrow(prev.date as string),
-      }),
-    });
-  }
-
-  function handleHashFilter(hash: string) {
-    if (hash === hashtag) {
-      navigate({
-        search: (prev) => {
-          const newParams = { ...prev };
-          delete newParams.hashtag;
-          return newParams;
-        },
-      });
-    } else {
-      navigate({
-        search: (prev) => {
-          return {
-            ...prev,
-            hashtag: hash,
-          };
-        },
-      });
-    }
-  }
-  const navigate = useNavigate({ from: Route.fullPath });
   const form = useForm({
     defaultValues: {
       todo: "",
@@ -194,11 +147,11 @@ function HomePage() {
 
       {!date_all && (
         <div className="flex justify-between mt-1">
-          <Button onClick={handleYesterday}>Yesterday</Button>
+          <Button onClick={yesterday}>Yesterday</Button>
           {date !== dateUtils.getToday() && (
-            <Button onClick={handleToday}>Today</Button>
+            <Button onClick={today}>Today</Button>
           )}
-          <Button onClick={handleTomorrow}>Tomorrow</Button>
+          <Button onClick={tomorrow}>Tomorrow</Button>
         </div>
       )}
 
@@ -250,7 +203,7 @@ function HomePage() {
             {todosInfo?.hashSet.map((hash, index) => (
               <li
                 key={index}
-                onClick={() => handleHashFilter(hash)}
+                onClick={() => hashFilter(hash)}
                 className={clsx(
                   hashtag === hash && "font-bold",
                   "transition-all duration-300 hover:cursor-pointer hover:font-semibold p-1"
