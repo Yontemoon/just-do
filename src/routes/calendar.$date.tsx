@@ -36,11 +36,14 @@ function CalendarComponent() {
   //Why does this rerender when dialog opens?
   console.log(todos);
   const todosInfo = useMemo(() => generateDateInfo(todos), [todos]);
-  const filteredTodos = useMemo(() => filterTodosCalendar(todos), [todos]);
-  const eventTodos = useMemo(
-    () => convertCalendarEvents(filteredTodos),
-    [filteredTodos]
-  );
+  const eventTodos = useMemo(() => {
+    const filteredTodos = filterTodosCalendar(todos);
+    return convertCalendarEvents(filteredTodos);
+  }, [todos]);
+  // const eventTodos = useMemo(
+  //   () => convertCalendarEvents(filteredTodos),
+  //   [filteredTodos]
+  // );
 
   const handleDateClick = (dateInfo: DateClickArg) => {
     const target = dateInfo.jsEvent.target as HTMLElement;

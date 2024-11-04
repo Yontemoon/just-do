@@ -53,7 +53,18 @@ const useSearchDate = () => {
     }
   }
 
-  return { yesterday, today, tomorrow, hashFilter };
+  function displayAll(checked: boolean) {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        date_all: checked,
+        date: checked ? undefined : dateUtils.getToday(),
+        hashtag: undefined,
+      }),
+    });
+  }
+
+  return { yesterday, today, tomorrow, hashFilter, displayAll };
 };
 
 export default useSearchDate;

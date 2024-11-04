@@ -45,7 +45,8 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { display, date, date_all, hashtag } = Route.useSearch();
-  const { today, tomorrow, yesterday, hashFilter } = useSearchDate();
+  const { today, tomorrow, yesterday, hashFilter, displayAll } =
+    useSearchDate();
   const invalidateQueries = useInvalidateQueries();
   const navigate = useNavigate({ from: Route.fullPath });
 
@@ -132,16 +133,7 @@ function HomePage() {
         </div>
         <Switch
           checked={date_all}
-          onChange={(checked) => {
-            navigate({
-              search: (prev) => ({
-                ...prev,
-                date_all: checked,
-                date: checked ? undefined : dateUtils.getToday(),
-                hashtag: undefined,
-              }),
-            });
-          }}
+          onChange={(checked) => displayAll(checked)}
         />
       </div>
 
