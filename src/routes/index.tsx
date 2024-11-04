@@ -19,6 +19,7 @@ import todos from "@/helper/todos";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import useSearchDate from "@/hooks/useSearchDate";
+import { format } from "date-fns"
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -108,7 +109,7 @@ function HomePage() {
 
   return (
     <div className="max-w-3xl m-auto">
-      <p>{date}</p>
+      {date ? <p>{format(date, "PPP")} </p> : <p>Showing All</p>}
       <div className="flex justify-between">
         <div>
           <Label>Filter</Label>

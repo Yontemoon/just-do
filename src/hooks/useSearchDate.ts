@@ -54,6 +54,7 @@ const useSearchDate = () => {
   }
 
   function displayAll(checked: boolean) {
+    console.log(checked)
     navigate({
       search: (prev) => ({
         ...prev,
