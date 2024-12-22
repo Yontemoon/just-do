@@ -1,4 +1,8 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  Outlet,
+  ScrollRestoration,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Footer from "@/components/Footer";
 import { useDialogStore } from "@/store/useDialogStore";
@@ -7,9 +11,35 @@ import Error from "@/components/Error";
 import { QueryClient } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Meta, Scripts } from "@tanstack/start";
+import React from "react";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
+    head: () => ({
+      meta: [
+        {
+          charSet: "utf-8",
+        },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+        {
+          title: "Just Do",
+        },
+      ],
+      // links: [
+      //   {
+      //     rel: "stylesheet",
+      //     href: "https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap",
+      //   },
+      //   {
+      //     rel: "stylesheet",
+      //     href: styles,
+      //   },
+      // ],
+    }),
     component: RootComponent,
     loader: Loader,
     errorComponent: Error,
@@ -20,7 +50,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
   const { DialogComponent, dialogProps } = useDialogStore();
   return (
-    <>
+    <RootDocument>
       <Navbar />
       <main>
         <Outlet />
@@ -39,6 +69,21 @@ function RootComponent() {
         />
       </main>
       <Footer />
-    </>
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html>
+      <head>
+        <Meta />
+      </head>
+      <body>
+        <React.Suspense>{children}</React.Suspense>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
   );
 }

@@ -19,7 +19,7 @@ import todos from "@/helper/todos";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import useSearchDate from "@/hooks/useSearchDate";
-import { format } from "date-fns"
+import { format } from "date-fns";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
@@ -46,6 +46,7 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { display, date, date_all, hashtag } = Route.useSearch();
+  console.log("rerendering");
   const { today, tomorrow, yesterday, hashFilter, displayAll } =
     useSearchDate();
   const invalidateQueries = useInvalidateQueries();

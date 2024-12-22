@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import Button from "./Button";
-import useUser from "@/hooks/useUser";
+import useUser from "../hooks/useUser";
 import { dateUtils, monthUtils } from "@/helper/utils";
 import { useDialogStore } from "@/store/useDialogStore";
 import DialogConfirmLogout from "./dialogs/DialogConfirmLogout";
