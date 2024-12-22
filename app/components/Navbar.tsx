@@ -12,51 +12,45 @@ const Navbar = () => {
   const location = useLocation();
 
   return (
-    <nav>
-      <ul className="flex justify-between">
-        <li>
-          <Link
-            to="/"
-            search={{
-              display: "all",
-              date: dateUtils.getToday(),
-              date_all: false,
-            }}
-            className={clsx(location.pathname === "/" && "font-bold")}
-          >
-            Home
-          </Link>
-          <Link
-            to="/calendar/$date"
-            className={clsx(
-              location.pathname.includes("/calendar") && "font-bold"
-            )}
-            params={{ date: monthUtils.today() }}
-          >
-            Calendar
-          </Link>
-          <Link to="/stats" className="[&.active]:font-bold">
-            Stats
-          </Link>
-        </li>
+    <nav className="flex justify-between">
+      <Link
+        to="/"
+        search={{
+          display: "all",
+          date: dateUtils.getToday(),
+          date_all: false,
+        }}
+        className={clsx(location.pathname === "/" && "font-bold")}
+      >
+        <div>Home</div>
+      </Link>
+      <Link
+        to="/calendar/$date"
+        className={clsx(location.pathname.includes("/calendar") && "font-bold")}
+        params={{ date: monthUtils.today() }}
+      >
+        <div>Calendar</div>
+      </Link>
+      <Link to="/stats" className="[&.active]:font-bold">
+        <div>Stats</div>
+      </Link>
 
-        {user ? (
-          <>
-            <li>{user}</li>
-            <li>
-              <Button
-                onClick={() => {
-                  openDialog(DialogConfirmLogout);
-                }}
-              >
-                Sign Out
-              </Button>
-            </li>
-          </>
-        ) : (
-          <Link to="/signin">Login</Link>
-        )}
-      </ul>
+      {user ? (
+        <>
+          <div>{user}</div>
+          <div>
+            <Button
+              onClick={() => {
+                openDialog(DialogConfirmLogout);
+              }}
+            >
+              Sign Out
+            </Button>
+          </div>
+        </>
+      ) : (
+        <Link to="/signin">Login</Link>
+      )}
     </nav>
   );
 };

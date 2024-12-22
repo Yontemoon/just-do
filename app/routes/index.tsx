@@ -25,6 +25,7 @@ export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
   beforeLoad: () => {
     const user = auth.getUserId();
+    console.log(user);
     if (!user) {
       throw redirect({
         to: "/signin",

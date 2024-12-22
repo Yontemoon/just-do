@@ -13,6 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Meta, Scripts } from "@tanstack/start";
 import React from "react";
+import styles from "@/index.css?url";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -29,16 +30,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           title: "Just Do",
         },
       ],
-      // links: [
-      //   {
-      //     rel: "stylesheet",
-      //     href: "https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap",
-      //   },
-      //   {
-      //     rel: "stylesheet",
-      //     href: styles,
-      //   },
-      // ],
+      links: [
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap",
+        },
+        {
+          rel: "stylesheet",
+          href: styles,
+        },
+      ],
     }),
     component: RootComponent,
     loader: Loader,
@@ -75,7 +76,7 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html>
+    <html lang="en">
       <head>
         <Meta />
       </head>
