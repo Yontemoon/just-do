@@ -8,12 +8,14 @@ import Footer from "@/components/Footer";
 import { useDialogStore } from "@/store/useDialogStore";
 import Loader from "@/components/Loader";
 import Error from "@/components/Error";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Meta, Scripts } from "@tanstack/start";
 import React from "react";
 import styles from "@/index.css?url";
+
+const queryClient = new QueryClient();
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   {
@@ -52,24 +54,26 @@ function RootComponent() {
   const { DialogComponent, dialogProps } = useDialogStore();
   return (
     <RootDocument>
-      <Navbar />
-      <main>
-        <Outlet />
-        {DialogComponent && <DialogComponent {...dialogProps} />}
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </main>
-      <Footer />
+      <QueryClientProvider client={queryClient}>
+        <Navbar />
+        <main>
+          <Outlet />
+          {DialogComponent && <DialogComponent {...dialogProps} />}
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </main>
+        <Footer />
+      </QueryClientProvider>
     </RootDocument>
   );
 }

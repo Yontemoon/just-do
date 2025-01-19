@@ -23,15 +23,15 @@ import { format } from "date-fns";
 
 export const Route = createFileRoute("/")({
   validateSearch: HomePageSPSchema,
-  beforeLoad: () => {
-    const user = auth.getUserId();
-    console.log(user);
-    if (!user) {
-      throw redirect({
-        to: "/signin",
-      });
-    }
-  },
+  // beforeLoad: () => {
+  //   const user = auth.getUserId();
+  //   console.log("this is in the server", user);
+  //   if (!user) {
+  //     throw redirect({
+  //       to: "/signin",
+  //     });
+  //   }
+  // },
   loaderDeps: ({ search: { date_all, date, display } }) => ({
     date_all,
     date,

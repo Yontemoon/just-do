@@ -12,7 +12,7 @@ const Navbar = () => {
   const location = useLocation();
 
   return (
-    <nav className="flex justify-between">
+    <nav className="">
       <Link
         to="/"
         search={{
@@ -22,17 +22,17 @@ const Navbar = () => {
         }}
         className={clsx(location.pathname === "/" && "font-bold")}
       >
-        <div>Home</div>
+        <>Home</>
       </Link>
       <Link
         to="/calendar/$date"
         className={clsx(location.pathname.includes("/calendar") && "font-bold")}
         params={{ date: monthUtils.today() }}
       >
-        <div>Calendar</div>
+        <>Calendar</>
       </Link>
       <Link to="/stats" className="[&.active]:font-bold">
-        <div>Stats</div>
+        <>Stats</>
       </Link>
 
       {user ? (
